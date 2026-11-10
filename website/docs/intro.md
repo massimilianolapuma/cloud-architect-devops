@@ -22,6 +22,8 @@ Every chapter offers the same three views:
 - **Decide**: the decision matrix and the decision record (ADR).
 - **Copy**: the runnable template and how to adopt it.
 
+![Map of the repository: three audiences, the three views they use, and the repository folders that feed each view](pathname:///diagrams/00-foundations/repo-map.svg)
+
 ## How a topic is produced
 
 A topic goes through two agentic workflows with a human approval in between. `topic-design` runs parallel research and produces a design with a decision matrix and a draft ADR. After approval, `topic-build` writes the chapter, draws the diagrams, adds the runnable piece, verifies it, runs an adversarial review and produces the Italian translation.

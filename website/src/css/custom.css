@@ -28,3 +28,11 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Diagram SVGs embed colours for both schemes; keep them on a light card in every theme. */
+img[src*='/diagrams/'] {
+  background: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  color-scheme: light;
+}

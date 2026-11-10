@@ -16,6 +16,16 @@ tasks:
     cmds:
       - node tools/i18n-parity.mjs check
 
+  diagrams:export:
+    desc: Export new or changed diagrams/*.drawio to SVG under website/static/diagrams
+    cmds:
+      - node tools/diagrams.mjs export
+
+  diagrams:check:
+    desc: Fail if a diagram source has no current SVG export, or an SVG has no source
+    cmds:
+      - node tools/diagrams.mjs check
+
   site:build:
     desc: Build the bilingual Docusaurus site into website/build
     cmds:

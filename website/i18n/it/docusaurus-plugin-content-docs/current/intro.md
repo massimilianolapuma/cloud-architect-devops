@@ -2,7 +2,7 @@
 doc_type: page
 title: Introduzione
 slug: /
-source_sha256: e03d941164d7aaf2f4acc1eced525ac727b77580b774e29f5b1e371739e7ec3c
+source_sha256: a01a193b528b8b283fae7a10df0941f3496dc987f0bfc74ebbcb7e2d65a06878
 ---
 
 # Linee guida per Cloud Architect e DevOps
@@ -22,6 +22,8 @@ Ogni capitolo offre le stesse tre viste:
 - **Capire**: cos'è l'argomento e perché conta.
 - **Decidere**: la matrice decisionale e il registro della decisione (ADR).
 - **Copiare**: il template eseguibile e come adottarlo.
+
+![Mappa del repository: tre pubblici, le tre viste che usano e le cartelle del repository che alimentano ogni vista](pathname:///diagrams/00-foundations/repo-map.svg)
 
 ## Come nasce un argomento
 
