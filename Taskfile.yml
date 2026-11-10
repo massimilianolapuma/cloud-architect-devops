@@ -10,3 +10,20 @@ tasks:
     desc: Run unit tests for tools/
     cmds:
       - node --test "tools/**/*.test.mjs"
+
+  testbed:smoke:
+    desc: Prove the local test bed (minikube profile cad + 3 databases); see reference/testbed/RESULTS.md
+    cmds:
+      - bash reference/testbed/smoke.sh
+
+  testbed:down:
+    desc: Remove the cad-smoke-* containers and the minikube profile cad
+    cmds:
+      - |
+        for c in $(docker ps -a --filter 'name=^cad-smoke-' --format '{{.Names}}'); do
+          docker rm -f "$c"
+        done
+      - |
+        orig="$(kubectl config current-context 2>/dev/null || true)"
+        CONTAINER_CONNECTION=podman-machine-default minikube delete -p cad || true
+        if [ -n "$orig" ]; then kubectl config use-context "$orig" >/dev/null 2>&1 || true; fi
