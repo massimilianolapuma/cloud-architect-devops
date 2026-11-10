@@ -104,3 +104,15 @@ test('non-markdown files are ignored', async () => {
     },
   );
 });
+
+test('stamp on an empty frontmatter block does not touch the body', async () => {
+  const body = '# x\n\n---\nfoo\n';
+  await withDirs({ en: { 'a.md': '# a\n' }, it: { 'a.md': `---\n---\n${body}` } }, async (d) => {
+    await stamp({ ...d, relPath: 'a.md' });
+    const out = await readFile(path.join(d.itDir, 'a.md'), 'utf8');
+    assert.match(out, /^---\nsource_sha256: [0-9a-f]{64}\n---\n/);
+    assert.ok(out.endsWith(`---\n${body}`));
+    assert.equal(out.match(/source_sha256/g).length, 1);
+    assert.deepEqual(await checkParity(d), { missing: [], orphan: [], stale: [] });
+  });
+});

@@ -20,9 +20,9 @@ const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
 
 // Splits a leading `---` frontmatter block. Returns null when there is none.
 function splitFrontmatter(text) {
-  const m = /^---(\r?\n)([\s\S]*?)(?:^|\r?\n)---(?=\r?\n|$)/.exec(text);
+  const m = /^---(\r?\n)(?:---|([\s\S]*?)\r?\n---)(?=\r?\n|$)/.exec(text);
   if (!m) return null;
-  return { eol: m[1], inner: m[2], start: 0, end: m[0].length };
+  return { eol: m[1], inner: m[2] ?? '', start: 0, end: m[0].length };
 }
 
 function readStamp(text) {
@@ -61,8 +61,9 @@ export async function stamp({ enDir, itDir, relPath }) {
     out = text.slice(0, 3 + fm.eol.length) + inner + text.slice(3 + fm.eol.length + fm.inner.length);
   } else {
     const at = 3 + fm.eol.length + fm.inner.length;
-    const sep = fm.inner === '' ? '' : fm.eol;
-    out = text.slice(0, at) + sep + line + text.slice(at);
+    out = fm.inner === ''
+      ? text.slice(0, at) + line + fm.eol + text.slice(at)
+      : text.slice(0, at) + fm.eol + line + text.slice(at);
   }
   await writeFile(itPath, out);
 }
