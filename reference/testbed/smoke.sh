@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
-# Local test bed smoke: proves what this machine can run (cluster with an
-# enforcing CNI + PostgreSQL, MongoDB, SQL Server). Exits 1 on the first
-# failed assertion and names it. Tear down with `task testbed:down`.
+# Local test bed smoke: proves what the dedicated Podman machine "cad" can run
+# (cluster with an enforcing CNI + PostgreSQL, MongoDB, SQL Server under
+# Rosetta). Exits 1 on the first failed assertion and names it. Refuses to run
+# unless "cad" is the active machine. Tear down with `task testbed:down`.
 set -euo pipefail
 
-# minikube is configured rootless; pin the rootless Podman connection so the
-# script does not depend on the machine-wide default connection.
-export CONTAINER_CONNECTION="${CONTAINER_CONNECTION:-podman-machine-default}"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# First action: never touch anything unless the dedicated machine is running.
+if ! bash "${HERE}/podman/machine.sh" status; then
+  echo "refusing to run: stop your running machine and start cad first (see CLAUDE.md)" >&2
+  exit 1
+fi
+
+MACHINE="cad"
+# Every container command and minikube use this connection explicitly; the
+# user's default machine and connection are never referenced.
+export CONTAINER_CONNECTION="$MACHINE"
+
+pc() { podman --connection "$MACHINE" "$@"; }
 
 PROFILE="cad"
 CTX="cad"
@@ -57,7 +69,7 @@ wait_for() { # wait_for <seconds> <description> <command...>
 # --- 1. cluster with an enforcing CNI ---
 assert "1. minikube start -p ${PROFILE} (cni=${CNI})"
 minikube start -p "$PROFILE" --driver=podman --container-runtime=containerd \
-  --cni="$CNI" --memory=3g --cpus=2 --wait=all --wait-timeout=10m
+  --cni="$CNI" --memory=6g --cpus=4 --wait=all --wait-timeout=10m
 restore_context
 kc get nodes
 pass
@@ -110,50 +122,66 @@ pass
 
 # --- 4. PostgreSQL ---
 assert "4. ${PG_IMAGE} answers SELECT 1"
-docker run -d --name cad-smoke-postgres -e POSTGRES_PASSWORD="$DB_PASSWORD" "$PG_IMAGE" >/dev/null
-wait_for 120 "postgres" docker exec cad-smoke-postgres pg_isready -U postgres
+pc run -d --name cad-smoke-postgres -e POSTGRES_PASSWORD="$DB_PASSWORD" "$PG_IMAGE" >/dev/null
+wait_for 120 "postgres" pc exec cad-smoke-postgres pg_isready -U postgres
 # pg_isready can pass during init; retry the query itself
-wait_for 60 "postgres SELECT 1" docker exec cad-smoke-postgres psql -U postgres -tAc 'SELECT 1'
-[ "$(docker exec cad-smoke-postgres psql -U postgres -tAc 'SELECT 1')" = "1" ]
+wait_for 60 "postgres SELECT 1" pc exec cad-smoke-postgres psql -U postgres -tAc 'SELECT 1'
+[ "$(pc exec cad-smoke-postgres psql -U postgres -tAc 'SELECT 1')" = "1" ]
 pass
 
 # --- 5. MongoDB ---
 assert "5. ${MONGO_IMAGE} answers ping"
-docker run -d --name cad-smoke-mongo "$MONGO_IMAGE" >/dev/null
-wait_for 120 "mongo ping" docker exec cad-smoke-mongo mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'
-[ "$(docker exec cad-smoke-mongo mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok')" = "1" ]
+pc run -d --name cad-smoke-mongo "$MONGO_IMAGE" >/dev/null
+wait_for 120 "mongo ping" pc exec cad-smoke-mongo mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'
+[ "$(pc exec cad-smoke-mongo mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok')" = "1" ]
 pass
 
-# --- 6. SQL Server (native first, then linux/amd64) ---
-assert "6. ${MSSQL_IMAGE} answers SELECT 1"
+# --- 6. SQL Server (linux/amd64 under Rosetta) ---
+assert "6. ${MSSQL_IMAGE} (linux/amd64, Rosetta) answers SELECT 1"
 mssql_query() {
-  docker exec cad-smoke-mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa \
+  pc exec cad-smoke-mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa \
     -P "$DB_PASSWORD" -h -1 -W -Q 'SET NOCOUNT ON; SELECT 1'
 }
-MSSQL_MODE=""
-for mode in native linux/amd64; do
-  docker rm -f cad-smoke-mssql >/dev/null 2>&1 || true
-  platform="$mode"
-  [ "$mode" != "native" ] || platform=""
-  echo "SQL Server attempt: ${mode}"
-  # ${platform:+...} keeps this safe under `set -u` on macOS bash 3.2.
-  if docker run -d --name cad-smoke-mssql ${platform:+--platform "$platform"} \
-      -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="$DB_PASSWORD" "$MSSQL_IMAGE" >/dev/null \
-    && wait_for 240 "sql server (${mode})" mssql_query \
-    && [ "$(mssql_query)" = "1" ]; then
-    MSSQL_MODE="$mode"; break
+# Fail at once if the container died (e.g. segfault under QEMU) instead of
+# waiting out the timeout.
+mssql_ready() {
+  local state
+  state="$(pc inspect -f '{{.State.Status}}' cad-smoke-mssql)"
+  if [ "$state" != "running" ]; then
+    echo "SQL Server container is ${state}, exit code $(pc inspect -f '{{.State.ExitCode}}' cad-smoke-mssql); last logs:" >&2
+    pc logs --tail 20 cad-smoke-mssql >&2 || true
+    exit 1
   fi
-  echo "SQL Server mode ${mode} failed; last logs:" >&2
-  docker logs --tail 15 cad-smoke-mssql >&2 || true
+  mssql_query >/dev/null 2>&1
+}
+pc run -d --name cad-smoke-mssql --platform linux/amd64 \
+  -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="$DB_PASSWORD" "$MSSQL_IMAGE" >/dev/null
+end=$((SECONDS + 240))
+until mssql_ready; do
+  if [ "$SECONDS" -ge "$end" ]; then echo "timeout waiting for sql server" >&2; exit 1; fi
+  sleep 3
 done
-[ -n "$MSSQL_MODE" ]
-echo "SQL_SERVER_MODE=${MSSQL_MODE}"
+[ "$(mssql_query)" = "1" ]
+# Proof that Rosetta (not QEMU) runs the amd64 image.
+binfmt="$(podman machine ssh "$MACHINE" ls /proc/sys/fs/binfmt_misc/)"
+echo "machine binfmt_misc entries: $(printf '%s' "$binfmt" | tr '\n' ' ')"
+printf '%s\n' "$binfmt" | grep -qx rosetta
+if printf '%s\n' "$binfmt" | grep -q '^qemu-x86_64$'; then
+  echo "QEMU x86_64 emulation is registered; Rosetta is not the only path" >&2
+  exit 1
+fi
+pc top cad-smoke-mssql args 2>/dev/null | head -3 || true
+echo "SQL_SERVER_MODE=linux/amd64+rosetta"
 pass
 
 # --- 7. memory with everything up ---
 assert "7. record free memory of the Podman machine with cluster + 3 databases"
-podman machine ssh free -m
-docker stats --no-stream --format '{{.Name}} {{.MemUsage}}' || true
+echo "machine memory (MiB):"
+podman machine ssh "$MACHINE" free -m
+echo "per-container memory:"
+pc stats --no-stream --format '{{.Name}} {{.MemUsage}}'
+echo "minikube node container memory:"
+pc stats --no-stream --format '{{.Name}} {{.MemUsage}}' "$PROFILE" || true
 pass
 
-echo "All 7 assertions passed (cni=${CNI}, sqlserver=${MSSQL_MODE})."
+echo "All 7 assertions passed (cni=${CNI}, sqlserver=amd64+rosetta)."

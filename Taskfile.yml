@@ -68,14 +68,24 @@ tasks:
     cmds:
       - bash reference/testbed/smoke.sh
 
-  testbed:down:
-    desc: Remove the cad-smoke-* containers and the minikube profile cad
+  machine:init:
+    desc: Create the dedicated Podman machine cad (applehv + Rosetta); never starts or switches machines
     cmds:
-      - |
-        for c in $(docker ps -aq --filter 'name=^cad-smoke-'); do
-          docker rm -f "$c"
-        done
+      - bash reference/testbed/podman/machine.sh init
+
+  machine:status:
+    desc: Exit 0 only when the dedicated Podman machine cad is the running one
+    cmds:
+      - bash reference/testbed/podman/machine.sh status
+
+  testbed:down:
+    desc: Remove the cad-smoke-* containers and the minikube profile cad (only while machine cad is active)
+    cmds:
+      - bash reference/testbed/podman/machine.sh status
       - |
         orig="$(kubectl config current-context 2>/dev/null || true)"
-        CONTAINER_CONNECTION=podman-machine-default minikube delete -p cad || true
+        for c in $(podman --connection cad ps -aq --filter 'name=^cad-smoke-'); do
+          podman --connection cad rm -f "$c"
+        done
+        CONTAINER_CONNECTION=cad minikube delete -p cad || true
         if [ -n "$orig" ]; then kubectl config use-context "$orig" >/dev/null 2>&1 || true; fi
