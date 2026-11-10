@@ -11,7 +11,7 @@ An ADR records one decision in MADR form, starting from `templates/adr.en.md`. A
 
 ## Hard rules
 
-1. `status: proposed` on every ADR you create or edit. Never write `accepted`. Write `superseded` only when the caller's prompt explicitly says the user superseded it.
+1. New ADRs get `status: proposed`. Never change the `status` of an existing ADR. Before editing an existing ADR, read its `status`: if it is not `proposed`, do not edit the file; report the edit you would make instead. Never write `accepted` or `superseded`: only the user does.
 2. Never renumber or rename an existing ADR. Updating means editing that file.
 3. Every option, driver and consequence comes from `.work/<topic>/design.md` and the research files; unsupported technical claims are prefixed `UNVERIFIED:` or deleted.
 4. Link only to files that exist now. A file that does not exist yet (for example the chapter during `topic-design`) is named as a code span, e.g. `website/docs/00-foundations/docs-as-code.mdx`; a broken link fails `task site:build`.
@@ -26,7 +26,7 @@ An ADR records one decision in MADR form, starting from `templates/adr.en.md`. A
 ## Steps
 
 1. Read design.md (options, drivers, recommendation, when to deviate), the research files and `templates/adr.en.md`.
-2. Frontmatter: `doc_type: adr`, real `title`, `status: proposed`, `date` = today (`date +%F`), `deciders` as named in design.md (if none: `pending`, and list it as an open question in your report).
+2. Frontmatter of a new ADR (an existing one keeps its `status`, rule 1): `doc_type: adr`, real `title`, `status: proposed`, `date` = today (`date +%F`), `deciders` as named in design.md (if none: `pending`, and list it as an open question in your report).
 3. H1: `# ADR NNNN: <title>`.
 4. Keep these H2 headings verbatim (the lint requires the first three): `Context and Problem Statement`, `Decision Drivers`, `Considered Options`, `Decision Outcome` (with `### Consequences`, `### Confirmation`), `Pros and Cons of the Options` (one `###` per option, renamed to the option), `More Information`.
 5. Context: neutral, two to four sentences, no hint of the answer. Considered Options: every option in design.md, chosen one included. Decision Outcome: `Chosen option: "<name>", because <main reason>.` Confirmation: a concrete check (a task, a lint, a review step).
@@ -46,5 +46,6 @@ grep -nE '_Guidance:|names-or-roles|2026-01-01|NNNN|Short title of the decision|
 ## Red flags: stop
 
 - You are about to type `status: accepted` because the design "is approved". Approval of a design is not acceptance of the ADR.
+- You are editing an ADR whose `status` is `accepted` or `superseded`, or you are about to change any ADR's `status` line. Stop and report the edit instead.
 - The number you picked already exists, or you are reusing a number from another branch of thought.
 - An option in the chapter's matrix is missing from Considered Options, or the chosen option differs from the chapter's recommendation.

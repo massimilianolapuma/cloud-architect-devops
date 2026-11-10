@@ -67,12 +67,13 @@ Decisions the user must take, and research gaps (UNVERIFIED items that matter).
 
 ## Hard rules
 
-1. **No cloud resources, ever**: no cloud credentials, no `az`/`gcloud` account commands, no `terraform plan/apply` against Azure or GCP. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`. Never run `podman system connection`, `podman machine ...` or edit `containers.conf`. You do not need containers or clusters for your work.
-2. You never mark an ADR `accepted` and never set a chapter beyond `status: draft`. The user approves.
-3. In `design` mode you do not write the chapter. In every mode you do not write Italian files, diagrams, flows or `reference/`.
-4. Verification status in the chapter lists only executed commands with evidence (skill `guideline-chapter`, rule 2).
-5. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings.
-6. Git: commit only when your caller tells you to, with explicit paths and Conventional Commits; never push, never switch branches.
+1. **No cloud resources, ever**: no cloud credentials, no `az`/`gcloud` account commands, no `terraform plan/apply` against Azure or GCP. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`.
+2. **No container, cluster or Podman commands; never run `testbed:*` or `ref:*` tasks.** No `podman`, `docker`, `kubectl` or `minikube`, no `podman system connection`, `podman machine ...`, no edits to `containers.conf`. Runtime evidence comes only from `reference/<area>/<piece>/RESULTS.md` or verifier output handed to you.
+3. You never mark an ADR `accepted` and never change the `status` of an existing ADR (skill `adr-author`, rule 1); you never set a chapter beyond `status: draft`. The user approves.
+4. In `design` mode you do not write the chapter. In every mode you do not write Italian files, diagrams, flows or `reference/`.
+5. Verification status in the chapter lists only executed commands with evidence (skill `guideline-chapter`, rule 2).
+6. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings.
+7. Git: commit only when your caller tells you to, with explicit paths and Conventional Commits; never push, never switch branches.
 
 ## Done when
 

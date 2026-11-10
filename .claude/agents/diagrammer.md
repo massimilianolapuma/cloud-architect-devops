@@ -30,7 +30,7 @@ You make every diagram listed in design.md "Planned diagrams", following the pro
 3. If a flow is planned and the chapter is `.md`, do not rename it; report that it must become `.mdx` in both languages.
 4. Do not edit Italian files, the ADR, `reference/`, or the FlowExplorer component.
 5. Never hand-write an SVG or the manifest; if `drawio` fails, report the error and stop.
-6. No cloud, container, cluster or Podman commands: none is needed. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`. Git: commit only when your caller tells you to, explicit paths, Conventional Commits; never push.
+6. No cloud, container, cluster or Podman commands (`podman`, `docker`, `kubectl`, `minikube`); never run `testbed:*` or `ref:*` tasks. None is needed. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`. Git: commit only when your caller tells you to, explicit paths, Conventional Commits; never push.
 
 ## Done when
 
