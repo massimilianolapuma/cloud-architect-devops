@@ -20,15 +20,16 @@ Only facts seen in this run are recorded here.
 |---|-----------|--------|
 | 1 | `minikube start -p cad` with Calico | PASS (about 1 to 2 minutes; Ready after 54 s to 92 s) |
 | 2 | `t-a` -> Service in `t-b` succeeds without policy | PASS (first success after 1 s) |
-| 3 | After default-deny ingress in `t-b`, same request times out | PASS (`Connection timed out after 5001 milliseconds`) |
+| 3 | After default-deny ingress in `t-b`, same request fails with curl exit 28 (timeout); after deleting the policy it succeeds again | PASS (exit code 28, then success after policy removal) |
 | 4 | `postgres:17` answers `SELECT 1` | PASS |
 | 5 | `mongo:8` answers `ping` | PASS |
 | 6 | SQL Server 2022 answers `SELECT 1` | FAIL in both modes |
 | 7 | Free memory with cluster and three databases | NOT REACHED (see below) |
 
 Conclusion for the test bed: Calico enforces NetworkPolicy on this machine.
-Assertion 3 passing after assertion 2 shows the block is the policy, not a
-network fault.
+The script requires curl exit code 28 under the policy and a successful
+request again after the policy is deleted, so the timeout is attributable to
+the policy and not to a DNS, kubectl or pod fault.
 
 ## SQL Server
 
@@ -65,10 +66,30 @@ profile running.
   `web.t-b.svc.cluster.local.`) worked immediately. Tests must use absolute
   names or pod/Service IPs.
 - minikube is configured rootless (`MINIKUBE_ROOTLESS=true` in its global
-  config) but the machine's default Podman connection is the root one, so
-  `minikube start` failed with "does not seem rootless" until
-  `CONTAINER_CONNECTION=podman-machine-default` was set. The script and
-  `testbed:down` set it for minikube only; `docker` containers run in the
+  config) but, in the run that failed first, `podman info` on the default
+  connection reported rootless=false, so `minikube start` failed with "does
+  not seem rootless". The script and `testbed:down` therefore set
+  `CONTAINER_CONNECTION=podman-machine-default` for minikube only (the `cad`
+  cluster runs in the rootless connection); `docker` containers run in the
   root connection.
+
+## Incident: Podman default connection changed during this task
+
+- Before: `podman system connection list` showed no connection as default
+  (both `Default` false). The user's `minikube` container was visible through
+  plain `podman ps` and the `docker` CLI (root connection).
+- Run during debugging (mistake): `podman system connection default
+  podman-machine-default`. Effect: the default became the rootless connection
+  and `minikube profile list` reported the user's `minikube` profile as
+  errored (its container is in the root connection). The container itself was
+  never stopped.
+- Attempted to unset the default by editing
+  `~/.config/containers/podman-connections.json`; that was denied and not
+  done. Then ran `podman system connection default podman-machine-default-root`
+  to restore the earlier behavior.
+- Now: `podman-machine-default-root` is marked default (`true`); it was unset
+  originally. Behavior matches the original (root), but the stored setting is
+  not identical to the original unset state. The user has been informed.
+
 - `task testbed:smoke` does not depend on `doctor`: `doctor` currently exits 1
   (unrelated broken `drawio`), which would block it.

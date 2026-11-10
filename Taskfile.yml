@@ -20,7 +20,7 @@ tasks:
     desc: Remove the cad-smoke-* containers and the minikube profile cad
     cmds:
       - |
-        for c in $(docker ps -a --filter 'name=^cad-smoke-' --format '{{.Names}}'); do
+        for c in $(docker ps -aq --filter 'name=^cad-smoke-'); do
           docker rm -f "$c"
         done
       - |

@@ -79,7 +79,7 @@ kc -n t-a exec client -- curl -sS -m 5 -o /dev/null http://${SVC_URL}
 pass
 
 # --- 3. default-deny ingress is enforced ---
-assert "3. default-deny ingress in t-b blocks the same request"
+assert "3. default-deny ingress in t-b makes the same request time out (curl 28); removing it restores access"
 kc apply -f - <<'YAML'
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -90,14 +90,22 @@ spec:
   podSelector: {}
   policyTypes: [Ingress]
 YAML
-blocked=0
-for _ in $(seq 1 10); do   # policy programming is async; allow it to converge
-  if ! kc -n t-a exec client -- curl -sS -m 5 -o /dev/null http://${SVC_URL}; then
-    blocked=1; break
-  fi
+# Require curl exit 28 (operation timed out). Any other failure (kubectl/exec
+# error, DNS = 6, refused = 7, missing pod) is not proof of enforcement.
+rc=0
+for _ in $(seq 1 15); do   # policy programming is async; allow it to converge
+  rc=0
+  kc -n t-a exec client -- curl -sS -m 5 -o /dev/null "http://${SVC_URL}" || rc=$?
+  [ "$rc" -eq 0 ] || break
   sleep 2
 done
-[ "$blocked" -eq 1 ]
+echo "request with default-deny in place: curl exit code ${rc}"
+[ "$rc" -eq 28 ]
+# Recovery: removing the policy must restore connectivity, proving the policy
+# (and not a lasting fault) caused the timeout.
+kc -n t-b delete networkpolicy default-deny-ingress
+wait_for 60 "service reachable again after policy removal" kc -n t-a exec client -- curl -sS -m 5 -o /dev/null "http://${SVC_URL}"
+echo "request after removing the policy: succeeded"
 pass
 
 # --- 4. PostgreSQL ---
