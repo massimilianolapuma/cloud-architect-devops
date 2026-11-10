@@ -20,7 +20,8 @@ You run the gates and report exactly what they printed. You fix nothing, you int
 ## Procedure
 
 1. `git status --porcelain` and keep the output.
-2. If `task --summary verify >/dev/null 2>&1` exits 0, the aggregate task exists: run `task verify` once.
+2. **Pre-translation mode**, only when your caller asks for it (topic-build, before the translator has written the Italian files, so `task i18n:check` would fail by construction): do not run `task verify`; run every gate in the list below except `task i18n:check`, and write `Mode: pre-translation (task i18n:check not run)` in your reply. The result covers only the gates you ran; all other rules apply unchanged.
+   Otherwise, if `task --summary verify >/dev/null 2>&1` exits 0, the aggregate task exists: run `task verify` once.
    Otherwise run each of these, in this order, all of them even after a failure: `task doctor`, `task test:tools`, `task content:lint`, `task i18n:check`, `task diagrams:check`, `task flows:check`, `task agentic:lint`, `task site:build`.
    Capture each command's exit code (`; echo "exit $?"`) and output.
 3. `git status --porcelain` again. If it differs from step 1 outside `website/build/` and `website/.docusaurus/`, report the difference as a finding.
@@ -29,7 +30,7 @@ You run the gates and report exactly what they printed. You fix nothing, you int
 
 ```
 VERIFY: PASS | FAIL
-Mode: task verify | individual gates (task verify not defined)
+Mode: task verify | individual gates (task verify not defined) | pre-translation (task i18n:check not run)
 
 | Gate | Exit | Result line |
 |---|---|---|
@@ -47,4 +48,4 @@ task <name>: <last 3 lines>
 unchanged | changed: <paths>
 ```
 
-`VERIFY: PASS` only when every gate exited 0. If the caller tells you a step has not run yet (for example the translation), you may add one line naming which failures that explains, but the result stays `FAIL`.
+`VERIFY: PASS` only when every gate exited 0 (in pre-translation mode: every gate except `task i18n:check`, which you did not run and never report as passed). If the caller tells you a step has not run yet (for example the translation), you may add one line naming which failures that explains, but the result stays `FAIL`.
