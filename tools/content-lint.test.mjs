@@ -70,3 +70,47 @@ test('ADR file named "first-adr.md" fails the NNNN-kebab rule', () => {
 test('doc_type page has no structural rules', () => {
   assert.deepEqual(lintDoc('---\ndoc_type: page\n---\n# Hi\n', 'en', 'p.md'), []);
 });
+
+test('unquoted valid date passes', () => {
+  assert.deepEqual(lintDoc(chapterEn({ last_reviewed: '2026-11-10' }), 'en', 'c.md'), []);
+});
+
+for (const bad of ['2026-13-45', '"2026-13-45"', '2026-02-30']) {
+  test(`impossible date ${bad} fails naming key and value`, () => {
+    const errs = lintDoc(chapterEn({ last_reviewed: bad }), 'en', 'c.md');
+    assert.equal(errs.length, 1);
+    assert.match(errs[0], /last_reviewed/);
+    assert.ok(errs[0].includes(bad.replaceAll('"', '')), errs[0]);
+  });
+}
+
+test('impossible ADR date fails', () => {
+  const adr = '---\ndoc_type: adr\nstatus: proposed\ndate: 2026-02-30\ndeciders: t\n---\n## Context and Problem Statement\n## Considered Options\n## Decision Outcome\n';
+  assert.match(lintDoc(adr, 'en', 'adr/0001-a.md').join('\n'), /date.*2026-02-30/);
+});
+
+test('main reports a missing directory without throwing', async () => {
+  const { main } = await import('./content-lint.mjs');
+  const logs = [];
+  const orig = console.log;
+  console.log = (l) => logs.push(l);
+  let code;
+  try {
+    code = await main([['nope-dir', 'en']]);
+  } finally {
+    console.log = orig;
+  }
+  assert.equal(code, 1);
+  assert.deepEqual(logs, ['nope-dir: directory not found']);
+});
+
+test('ADR outside adr/ is an error naming the location', () => {
+  const adr = '---\ndoc_type: adr\nstatus: proposed\ndate: 2026-11-10\ndeciders: t\n---\n## Context and Problem Statement\n## Considered Options\n## Decision Outcome\n';
+  assert.match(lintDoc(adr, 'en', 'topics/0001-a.md').join('\n'), /adr\//);
+  assert.match(lintDoc(adr, 'en', '0001-a.md').join('\n'), /adr\//);
+});
+
+test('chapter inside adr/ is an error, page is allowed', () => {
+  assert.match(lintDoc(chapterEn(), 'en', 'adr/c.md').join('\n'), /adr\//);
+  assert.deepEqual(lintDoc('---\ndoc_type: page\n---\n# Index\n', 'en', 'adr/index.md'), []);
+});

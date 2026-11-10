@@ -16,10 +16,14 @@ _Guidance: two to four sentences on the situation and the question being decided
 
 ## Decision Drivers
 
+_Guidance: the forces that shape the choice, such as constraints, quality goals and risks; one line each._
+
 - Driver one, for example a constraint or quality goal
 - Driver two
 
 ## Considered Options
+
+_Guidance: every option seriously weighed, including the one chosen; one line each._
 
 - Option A
 - Option B
@@ -33,6 +37,8 @@ _Guidance: state the choice and the main reason in one sentence; the details fol
 
 ### Consequences
 
+_Guidance: what becomes easier and what becomes harder or riskier because of this decision._
+
 - Good, because positive consequence.
 - Bad, because negative consequence or accepted trade-off.
 
@@ -42,12 +48,18 @@ _Guidance: how compliance with this decision will be checked (a test, a lint, a 
 
 ## Pros and Cons of the Options
 
+_Guidance: one subsection per option, with arguments tied to the drivers above._
+
 ### Option A
+
+_Guidance: rename to the option; list its strengths and weaknesses against the drivers._
 
 - Good, because argument.
 - Bad, because argument.
 
 ### Option B
+
+_Guidance: rename to the option; list its strengths and weaknesses against the drivers._
 
 - Good, because argument.
 - Bad, because argument.

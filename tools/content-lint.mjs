@@ -36,10 +36,20 @@ export const CONTRACT = {
   page: { fields: {}, sections: { en: [], it: [] } },
 };
 
-// YAML turns an unquoted 2026-11-10 into a Date; bring it back to a string.
-function scalar(v) {
-  if (v instanceof Date) return v.toISOString().slice(0, 10);
-  return v;
+// YAML turns an unquoted 2026-11-10 into a Date (and silently rolls impossible
+// dates over), so a date is validated as written in the file, not as parsed.
+function rawValue(rawFrontmatter, key) {
+  const m = new RegExp(`^${key}:[ \\t]*(.*?)[ \\t]*$`, 'm').exec(rawFrontmatter);
+  if (!m) return undefined;
+  return m[1].replace(/\s+#.*$/, '').replace(/^(["'])(.*)\1$/, '$2');
+}
+
+function isRealDate(text) {
+  const m = DATE.exec(text);
+  if (!m) return false;
+  const [y, mo, d] = text.split('-').map(Number);
+  const t = new Date(Date.UTC(y, mo - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === mo - 1 && t.getUTCDate() === d;
 }
 
 const isBlank = (v) => v === undefined || v === null || String(v).trim() === '';
@@ -65,7 +75,8 @@ function h2Headings(body) {
 export function lintDoc(text, locale, relPath) {
   let parsed;
   try {
-    parsed = matter(text);
+    // An options object bypasses gray-matter's cache, which drops `.matter` on repeat calls.
+    parsed = matter(text, {});
   } catch (e) {
     return [`invalid frontmatter: ${e.reason ?? e.message}`];
   }
@@ -79,12 +90,12 @@ export function lintDoc(text, locale, relPath) {
 
   const errors = [];
   for (const [field, rule] of Object.entries(rules.fields)) {
-    const value = scalar(data[field]);
+    const value = rule === 'date' ? rawValue(parsed.matter, field) : data[field];
     if (isBlank(value)) {
       errors.push(`missing frontmatter field "${field}"`);
     } else if (Array.isArray(rule) && !rule.includes(String(value))) {
       errors.push(`invalid ${field} "${value}" (allowed: ${rule.join(', ')})`);
-    } else if (rule === 'date' && !DATE.test(String(value))) {
+    } else if (rule === 'date' && !isRealDate(String(value))) {
       errors.push(`invalid ${field} "${value}" (expected YYYY-MM-DD)`);
     }
   }
@@ -94,6 +105,13 @@ export function lintDoc(text, locale, relPath) {
     if (!present.has(section)) errors.push(`missing section "${section}"`);
   }
 
+  const inAdrDir = path.posix.dirname(relPath.split(/[\\/]/).join('/')) === 'adr';
+  if (docType === 'adr' && !inAdrDir) {
+    errors.push('ADR must live directly in adr/ (website/docs/adr/NNNN-kebab-title.md)');
+  }
+  if (docType === 'chapter' && inAdrDir) {
+    errors.push('doc_type "chapter" is not allowed in adr/ (only adr or page)');
+  }
   if (docType === 'adr') {
     const base = relPath.split(/[\\/]/).pop();
     if (!ADR_NAME.test(base)) {
@@ -114,7 +132,15 @@ async function listMarkdown(dir) {
 export async function lintDirs(dirs) {
   const lines = [];
   for (const [dir, locale] of dirs) {
-    for (const rel of await listMarkdown(dir)) {
+    let files;
+    try {
+      files = await listMarkdown(dir);
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e;
+      lines.push(`${dir}: directory not found`);
+      continue;
+    }
+    for (const rel of files) {
       const text = await readFile(path.join(dir, rel), 'utf8');
       for (const err of lintDoc(text, locale, rel)) {
         lines.push(`${dir}/${rel}: ${err}`);

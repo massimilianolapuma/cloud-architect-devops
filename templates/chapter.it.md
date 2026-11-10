@@ -22,6 +22,8 @@ _Guidance: per l'architetto. Elenca le opzioni valutate, ciascuna con una riga c
 
 ### Opzioni
 
+_Guidance: un elenco puntato con le opzioni valutate, almeno due._
+
 - **Opzione A**: descrizione in una riga.
 - **Opzione B**: descrizione in una riga.
 

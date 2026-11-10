@@ -16,10 +16,14 @@ _Guidance: da due a quattro frasi sulla situazione e sulla domanda da decidere. 
 
 ## Fattori decisionali
 
+_Guidance: le forze che orientano la scelta, come vincoli, obiettivi di qualità e rischi; una riga ciascuno._
+
 - Primo fattore, per esempio un vincolo o un obiettivo di qualità
 - Secondo fattore
 
 ## Opzioni considerate
+
+_Guidance: ogni opzione valutata seriamente, compresa quella scelta; una riga ciascuna._
 
 - Opzione A
 - Opzione B
@@ -33,6 +37,8 @@ _Guidance: indica la scelta e la ragione principale in una frase; i dettagli seg
 
 ### Conseguenze
 
+_Guidance: cosa diventa più facile e cosa più difficile o rischioso a causa di questa decisione._
+
 - Positivo, perché conseguenza positiva.
 - Negativo, perché conseguenza negativa o compromesso accettato.
 
@@ -42,12 +48,18 @@ _Guidance: come si verifica il rispetto di questa decisione (un test, un lint, u
 
 ## Pro e contro delle opzioni
 
+_Guidance: una sottosezione per opzione, con argomenti legati ai fattori sopra._
+
 ### Opzione A
+
+_Guidance: rinomina con l'opzione; elenca punti di forza e debolezza rispetto ai fattori._
 
 - Positivo, perché argomento.
 - Negativo, perché argomento.
 
 ### Opzione B
+
+_Guidance: rinomina con l'opzione; elenca punti di forza e debolezza rispetto ai fattori._
 
 - Positivo, perché argomento.
 - Negativo, perché argomento.

@@ -22,6 +22,8 @@ _Guidance: for the architect. List the options considered, each with one line on
 
 ### Options
 
+_Guidance: one bullet per option considered, at least two._
+
 - **Option A**: one-line description.
 - **Option B**: one-line description.
 
