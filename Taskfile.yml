@@ -26,6 +26,11 @@ tasks:
     cmds:
       - node tools/flows.mjs
 
+  agentic:lint:
+    desc: Fail if a project skill, agent or saved workflow under .claude/ is missing or malformed
+    cmds:
+      - node tools/agentic-lint.mjs
+
   diagrams:export:
     desc: Export new or changed diagrams/*.drawio to SVG under website/static/diagrams
     cmds:
