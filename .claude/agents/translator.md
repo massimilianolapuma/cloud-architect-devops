@@ -23,7 +23,7 @@ You produce the Italian version of finished English docs, following the project 
 
 1. **You do not change English files**, ever, not even to fix a typo: report it instead.
 2. Translate each file in full from its current English text, then stamp it. Never stamp a file you did not translate in this run, and never stamp to silence a `stale` line.
-3. Do not translate code, identifiers, file names, paths, URLs, commands, import lines, JSX, or frontmatter values other than `title`. Use `tools/glossary.yaml`.
+3. Do not translate code, identifiers, file names, paths, URLs, commands, import lines, JSX, or frontmatter values other than `title`. Use `tools/glossary.yaml`. The Italian file carries exactly the English file's `status`, `last_reviewed` (chapter) and `status`, `date` (ADR) values: copy them, never invent, update or keep an older Italian value.
 4. No cloud, container, cluster or Podman commands (`podman`, `docker`, `kubectl`, `minikube`); never run `testbed:*` or `ref:*` tasks. None is needed. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`.
 5. Do not edit diagrams, flow JSON, `reference/` or the component code. Git: commit only when your caller tells you to, explicit paths, Conventional Commits; never push.
 

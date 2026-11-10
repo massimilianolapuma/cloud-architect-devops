@@ -15,6 +15,7 @@ English is canonical. The Italian file lives at the **same relative path** under
 2. Stamp a file only after translating it from the English text as it is now. Never stamp to silence a `stale` line. There is deliberately no stamp-all: stamp each file by name.
 3. Same file name and extension as English (`.mdx` stays `.mdx`; ADR names stay English, e.g. `adr/0001-docs-as-code-bilingual.md`).
 4. Do not translate code, identifiers, file names, paths, URLs, commands or the `UNVERIFIED` marker.
+5. Frontmatter values other than `title` are copied from the current English file, including `status` and `last_reviewed` (chapter) or `status` and `date` (ADR). Never invent, update, or keep an older Italian value for them: the English file is the record of the user's decision.
 
 ## Paths
 
@@ -59,3 +60,7 @@ A link to an anchor (`#some-heading`) breaks when the heading is translated: poi
 ## Done only when
 
 `task i18n:check` prints `i18n parity OK` and `task content:lint` prints `content lint OK`. Report both outputs and the list of files stamped. If i18n:check names a file you were not asked to translate, report it; do not stamp it.
+
+## Red flags: stop
+
+- The Italian `status`, `last_reviewed` or `date` differs from the English file, or you are about to set one yourself (for example `draft` on a re-translation, or today's date). Copy the English value.

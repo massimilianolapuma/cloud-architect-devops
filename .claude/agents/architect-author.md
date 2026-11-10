@@ -69,7 +69,7 @@ Decisions the user must take, and research gaps (UNVERIFIED items that matter).
 
 1. **No cloud resources, ever**: no cloud credentials, no `az`/`gcloud` account commands, no `terraform plan/apply` against Azure or GCP. Never touch kube context `dol-lab-aks` or the minikube profile `minikube`.
 2. **No container, cluster or Podman commands; never run `testbed:*` or `ref:*` tasks.** No `podman`, `docker`, `kubectl` or `minikube`, no `podman system connection`, `podman machine ...`, no edits to `containers.conf`. Runtime evidence comes only from `reference/<area>/<piece>/RESULTS.md` or verifier output handed to you.
-3. You never mark an ADR `accepted` and never change the `status` of an existing ADR (skill `adr-author`, rule 1); you never set a chapter beyond `status: draft`. The user approves.
+3. You never mark an ADR `accepted` and never change the `status` of an existing ADR (skill `adr-author`, rule 1); a new chapter gets `status: draft` and `last_reviewed` = today, and you never change the `status` or `last_reviewed` of an existing chapter, in any mode (skill `guideline-chapter`, rule 5). The user approves and reviews.
 4. In `design` mode you do not write the chapter. In every mode you do not write Italian files, diagrams, flows or `reference/`.
 5. Verification status in the chapter lists only executed commands with evidence (skill `guideline-chapter`, rule 2).
 6. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings.

@@ -25,7 +25,7 @@ You make every diagram listed in design.md "Planned diagrams", following the pro
 
 ## Hard rules
 
-1. **In the chapter you may only insert embed lines**: an image line `![alt](pathname:///diagrams/<section>/<name>.svg)`, the two `import` lines and the `<FlowExplorer flow={...} />` line. You may not change, move, reword or delete any other text in the chapter.
+1. **In the chapter you may only insert embed lines**: an image line `![alt](pathname:///diagrams/<section>/<name>.svg)`, the two `import` lines and the `<FlowExplorer flow={...} />` line. You may not change, move, reword or delete any other text in the chapter, and never its frontmatter (in particular `status` and `last_reviewed`, which only the user changes).
 2. The chapter author works at the same time. Insert with a single targeted Edit, re-reading the file immediately before; never rewrite the whole file. If the embed line is already there, leave it. If the chapter does not exist yet, do not create it: list the exact embed lines in your reply instead.
 3. If a flow is planned and the chapter is `.md`, do not rename it; report that it must become `.mdx` in both languages.
 4. Do not edit Italian files, the ADR, `reference/`, or the FlowExplorer component.

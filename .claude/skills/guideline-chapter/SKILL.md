@@ -15,7 +15,7 @@ A chapter gives three audiences what they need: **Understand** (stakeholders), *
 2. **Verification status lists only what was executed**, each with the exact command, the date and the result. Evidence counts only if it is (a) an offline command you ran in this session (a lint, a test or a build that needs no container, cluster or cloud; never `testbed:*` or `ref:*` tasks, never `podman`, `docker`, `kubectl` or `minikube`), (b) an entry in `reference/<area>/<piece>/RESULTS.md`, or (c) verifier output handed to you. Everything else goes under "Not exercised". Anything needing a cloud account, and anything needing containers or a cluster while the project Podman machine `cad` is not active, is "Not exercised live".
 3. **No template leftovers.** Every `_Guidance:` line and every placeholder value from the template is deleted or replaced (see the leftover check below).
 4. **English only, EN file only.** Do not create or edit Italian files, diagrams, flows or anything under `reference/` (other agents own them).
-5. `status: draft`. Only the user moves a chapter to `reviewed` or `approved`.
+5. **A new chapter gets `status: draft` and `last_reviewed` = today. An existing chapter's `status` and `last_reviewed` are never changed by an agent**, in any mode: they record decisions and reviews by the user, who alone moves a chapter to `reviewed` or `approved`. When you edit an existing chapter, leave both lines exactly as they are.
 
 ## Inputs and output
 
@@ -30,7 +30,7 @@ A chapter gives three audiences what they need: **Understand** (stakeholders), *
 ## Steps
 
 1. Read design.md, the three research files and `templates/chapter.en.md`.
-2. Copy the template to the output path. Frontmatter: `doc_type: chapter`, real `title`, `owner` as named in design.md (if none: `unassigned`, and say so in your report), `status: draft`, `last_reviewed` = today (`date +%F`).
+2. If the output file already exists, edit it in place and keep its `status` and `last_reviewed` (rule 5). Otherwise copy the template to the output path. Frontmatter of a new chapter: `doc_type: chapter`, real `title`, `owner` as named in design.md (if none: `unassigned`, and say so in your report), `status: draft`, `last_reviewed` = today (`date +%F`).
 3. Keep the four H2 headings verbatim: `Understand`, `Decide`, `Copy`, `Verification status`. Add further sections only where useful.
 4. **Understand**: problem, why it matters, outcome, in plain language; explain every term a non-engineer would not know. Embed each diagram design.md plans for this view, at its exact path: `![<what the diagram shows>](pathname:///diagrams/<section>/<name>.svg)`. The `pathname://` prefix is mandatory. If design.md plans a flow, add after the frontmatter and before the H1:
    ```mdx
@@ -46,7 +46,7 @@ A chapter gives three audiences what they need: **Understand** (stakeholders), *
 
 ## Fix mode (review findings)
 
-Given `.work/<topic>/review.md`: resolve every `blocker` and `major` finding in the chapter (and the ADR, see `adr-author`). Then append to review.md, under `## Author response`, one line per finding id: `R3: fixed — <what changed>` or `R3: rejected — <reason with evidence>`. Do not edit or delete the reviewer's findings. Update Verification status if new evidence exists.
+Given `.work/<topic>/review.md`: resolve every `blocker` and `major` finding in the chapter (and the ADR, see `adr-author`). Then append to review.md, under `## Author response`, one line per finding id: `R3: fixed — <what changed>` or `R3: rejected — <reason with evidence>`. Do not edit or delete the reviewer's findings. Do not touch `status` or `last_reviewed` (rule 5). Update Verification status if new evidence exists.
 
 ## Leftover check (must print nothing)
 
@@ -64,3 +64,4 @@ grep -nE '_Guidance:|team-or-person|2026-01-01|kebab-title|path/to/template|<sec
 - "Exercised live" lists something you did not see run, or that came from documentation.
 - You are tempted to write "should work" or "tested" for a cloud service.
 - The matrix totals were copied, not recomputed.
+- You are about to change the `status` or `last_reviewed` line of a chapter that already existed (for example back to `draft`, or today's date after a fix). Leave both as they are.
