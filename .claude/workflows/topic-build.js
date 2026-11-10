@@ -33,6 +33,29 @@ const reviewPath = `${work}/review.md`
 const researchPaths = ['azure', 'gcp', 'onprem'].map((lane) => `${work}/research-${lane}.md`)
 const NO_COMMIT = 'Do not commit: leave your changes uncommitted for the controller to review.'
 
+// Agents may return absolute paths. The script has no cwd, so a path is made repo-relative
+// on the string alone: cut everything before the first top-level entry of this repo. The
+// prefix cut the first time is the repo root; later absolute paths must start with it.
+// Returns null for a path with a '..' segment or one that cannot be normalised.
+const TOP_DIRS = ['.work', 'website', 'diagrams', 'reference', 'templates', 'tools', '.claude', 'docs']
+const TOP_FILES = ['Taskfile.yml', 'CLAUDE.md', 'README.md', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.gitignore']
+let repoRoot = null
+function repoPath(p) {
+  if (typeof p !== 'string') return null
+  const s = p.trim().replace(/^(\.\/)+/, '')
+  if (!s || s.split('/').includes('..')) return null
+  if (!s.startsWith('/')) return s
+  if (repoRoot) return s.startsWith(repoRoot) && s.length > repoRoot.length ? s.slice(repoRoot.length) : null
+  const segs = s.split('/')
+  const i = segs.findIndex((x, k) => k > 0 && (k < segs.length - 1 ? TOP_DIRS.includes(x) : TOP_FILES.includes(x)))
+  if (i < 0) return null
+  repoRoot = `${segs.slice(0, i).join('/')}/`
+  return segs.slice(i).join('/')
+}
+const pathProblem = (raw, expected) => (repoPath(raw) === null
+  ? `returned "${raw}", which is not a path inside the repo`
+  : `wrote ${repoPath(raw)}, expected ${expected}`)
+
 const strings = { type: 'array', items: { type: 'string' } }
 
 const PLAN_SCHEMA = {
@@ -149,10 +172,16 @@ const TRANSLATE_SCHEMA = {
 }
 
 // Collected deliverables (paths under .work/ are git-ignored and not listed).
-const files = new Set()
-const addFiles = (list) => (list || []).filter((f) => !f.startsWith('.work/')).forEach((f) => files.add(f))
 // Lines that make the result 'fail' whatever the final verifier says.
 const stepFailures = []
+const files = new Set()
+const addFiles = (step, list) => {
+  for (const raw of list || []) {
+    const f = repoPath(raw)
+    if (f === null) stepFailures.push(`${step}: returned file "${raw}", which is not a path inside the repo`)
+    else if (!f.startsWith('.work/')) files.add(f)
+  }
+}
 const finish = (verify, openFindings) => ({ verify, openFindings, files: [...files].sort() })
 
 // A verifier result counts as PASS only if it says PASS and every gate it ran exited 0.
@@ -170,14 +199,14 @@ const plan = await agent(
 if (!plan) throw new Error('topic-build: could not read design.md; nothing built.')
 if (plan.missing.length) throw new Error(`topic-build: missing inputs, run topic-design first: ${plan.missing.join(', ')}`)
 const chapterRe = new RegExp(`^website/docs/${section}/${t}\\.mdx?$`)
-if (!chapterRe.test(plan.chapterPath)) {
+const chapterPath = repoPath(plan.chapterPath)
+if (!chapterPath || !chapterRe.test(chapterPath)) {
   throw new Error(`topic-build: design.md "Chapter file" is "${plan.chapterPath}", expected website/docs/${section}/${t}.md or .mdx`)
 }
-if (!/^website\/docs\/adr\/\d{4}-[a-z0-9-]+\.md$/.test(plan.adrPath)) {
+const adrPath = repoPath(plan.adrPath)
+if (!adrPath || !/^website\/docs\/adr\/\d{4}-[a-z0-9-]+\.md$/.test(adrPath)) {
   throw new Error(`topic-build: design.md names ADR "${plan.adrPath}", expected website/docs/adr/NNNN-kebab-title.md`)
 }
-const chapterPath = plan.chapterPath
-const adrPath = plan.adrPath
 const runnable = !/^none\b/i.test(plan.runnablePiece.trim())
 log(`chapter ${chapterPath}, ADR ${adrPath}, runnable piece: ${runnable ? plan.runnablePiece : 'none (impl-builder skipped)'}`)
 
@@ -202,11 +231,11 @@ if (runnable) {
 const [chapter, diagrams, impl] = await parallel(builders)
 
 if (!diagrams) stepFailures.push('build: diagrammer did not complete')
-else addFiles(diagrams.files)
+else addFiles('build: diagrammer', diagrams.files)
 if (runnable) {
   if (!impl) stepFailures.push('build: impl-builder did not complete')
   else {
-    addFiles(impl.files)
+    addFiles('build: impl-builder', impl.files)
     if (impl.status === 'failed') stepFailures.push(`build: impl-builder failed: ${impl.output.split('\n')[0]}`)
     else log(`runnable piece: ${impl.status}${impl.task ? ` (task ${impl.task})` : ''}`)
   }
@@ -214,7 +243,7 @@ if (runnable) {
 if (!chapter) {
   return finish('fail', [...stepFailures, 'build: architect-author (chapter) did not complete; nothing to review'])
 }
-addFiles([chapterPath, adrPath, ...chapter.files])
+addFiles('build: architect-author', [chapterPath, adrPath, ...chapter.files])
 
 // ---------------------------------------------------------------------------
 phase('Verify')
@@ -237,7 +266,8 @@ const review = await agent(
 if (!review) {
   return finish('fail', [...stepFailures, 'review: adversarial-reviewer did not complete; nothing was fixed, translated or finally verified'])
 }
-if (review.reviewPath !== reviewPath) stepFailures.push(`review: written to ${review.reviewPath}, expected ${reviewPath}`)
+if (repoPath(review.reviewPath) !== reviewPath) stepFailures.push(`review: ${pathProblem(review.reviewPath, reviewPath)}`)
+const reviewGot = repoPath(review.reviewPath) || review.reviewPath
 const toFix = review.findings.filter((f) => f.severity === 'blocker' || f.severity === 'major')
 log(`review: ${review.findings.length} findings, ${toFix.length} blocker/major`)
 
@@ -258,7 +288,7 @@ if (needsFix) {
     extra.push(`The diagrammer could not insert these embed lines; make sure each is in the chapter:\n${pendingEmbeds.join('\n')}`)
   }
   fix = await agent(
-    `mode: fix\ntopic: ${topic}\ntitle: ${a.title}\nchapter: ${chapterPath}\nADR: ${adrPath}\nreview: ${review.reviewPath}\n\n` +
+    `mode: fix\ntopic: ${topic}\ntitle: ${a.title}\nchapter: ${chapterPath}\nADR: ${adrPath}\nreview: ${reviewGot}\n\n` +
     `${verifierInput}` +
     `${extra.length ? `\n\n${extra.join('\n\n')}` : ''}\n\n${NO_COMMIT}`,
     { agentType: 'architect-author', label: 'fix', phase: 'Fix', schema: FIX_SCHEMA },
@@ -266,7 +296,7 @@ if (needsFix) {
   if (!fix) {
     return finish('fail', [...stepFailures, ...toFix.map((f) => `${f.id} (${f.severity}): ${f.summary} — not addressed: fix step did not complete`)])
   }
-  addFiles(fix.files)
+  addFiles('fix: architect-author', fix.files)
   fix.gateFailuresNotFixed.forEach((g) => log(`fix: gate failure not fixed: ${g}`))
 } else {
   log('fix skipped: no blocker or major finding, no pending diagram embed, and the pre-translation verify passed')
@@ -297,7 +327,7 @@ const translation = await agent(
 if (!translation) {
   return finish('fail', [...stepFailures, ...openFindings, 'translate: translator did not complete; final verify not run'])
 }
-addFiles(translation.files)
+addFiles('translate: translator', translation.files)
 translation.englishIssues.forEach((i) => log(`translator noted in English: ${i}`))
 
 // ---------------------------------------------------------------------------

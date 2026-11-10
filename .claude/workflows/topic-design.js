@@ -28,6 +28,29 @@ const work = `.work/${t}`
 const LANES = ['azure', 'gcp', 'onprem']
 const NO_COMMIT = 'Do not commit: leave your changes uncommitted for the controller to review.'
 
+// Agents may return absolute paths. The script has no cwd, so a path is made repo-relative
+// on the string alone: cut everything before the first top-level entry of this repo. The
+// prefix cut the first time is the repo root; later absolute paths must start with it.
+// Returns null for a path with a '..' segment or one that cannot be normalised.
+const TOP_DIRS = ['.work', 'website', 'diagrams', 'reference', 'templates', 'tools', '.claude', 'docs']
+const TOP_FILES = ['Taskfile.yml', 'CLAUDE.md', 'README.md', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.gitignore']
+let repoRoot = null
+function repoPath(p) {
+  if (typeof p !== 'string') return null
+  const s = p.trim().replace(/^(\.\/)+/, '')
+  if (!s || s.split('/').includes('..')) return null
+  if (!s.startsWith('/')) return s
+  if (repoRoot) return s.startsWith(repoRoot) && s.length > repoRoot.length ? s.slice(repoRoot.length) : null
+  const segs = s.split('/')
+  const i = segs.findIndex((x, k) => k > 0 && (k < segs.length - 1 ? TOP_DIRS.includes(x) : TOP_FILES.includes(x)))
+  if (i < 0) return null
+  repoRoot = `${segs.slice(0, i).join('/')}/`
+  return segs.slice(i).join('/')
+}
+const pathProblem = (raw, expected) => (repoPath(raw) === null
+  ? `returned "${raw}", which is not a path inside the repo`
+  : `wrote ${repoPath(raw)}, expected ${expected}`)
+
 const RESEARCH_SCHEMA = {
   type: 'object',
   properties: {
@@ -81,7 +104,7 @@ LANES.forEach((lane, i) => {
   const r = research[i]
   const expected = `${work}/research-${lane}.md`
   if (!r) failedLanes.push(`${lane}: agent did not complete`)
-  else if (r.path !== expected) failedLanes.push(`${lane}: wrote ${r.path}, expected ${expected}`)
+  else if (repoPath(r.path) !== expected) failedLanes.push(`${lane}: ${pathProblem(r.path, expected)}`)
   else if (!(r.findings > 0)) failedLanes.push(`${lane}: no findings`)
   else log(`research ${lane}: ${r.findings} findings, ${r.unverified.length} unverified`)
 })
@@ -96,10 +119,11 @@ const design = await agent(
 )
 if (!design) throw new Error('topic-design: architect-author (design) did not complete; no design to check.')
 const designPath = `${work}/design.md`
-if (design.designPath !== designPath) {
-  throw new Error(`topic-design: architect-author reported ${design.designPath}, expected ${designPath}.`)
+if (repoPath(design.designPath) !== designPath) {
+  throw new Error(`topic-design: architect-author (design) ${pathProblem(design.designPath, designPath)}.`)
 }
-if (!/^website\/docs\/adr\/\d{4}-[a-z0-9-]+\.md$/.test(design.adrPath)) {
+const adrPath = repoPath(design.adrPath)
+if (!adrPath || !/^website\/docs\/adr\/\d{4}-[a-z0-9-]+\.md$/.test(adrPath)) {
   throw new Error(`topic-design: ADR path "${design.adrPath}" is not website/docs/adr/NNNN-kebab-title.md.`)
 }
 
@@ -117,10 +141,15 @@ const check = await agent(
 if (!check) {
   openQuestions.push('design-check did not complete: design.md has not been checked against the research files')
 } else {
-  log(`design-check: ${check.findings.length} findings in ${check.reviewPath}`)
+  const reviewPath = `${work}/review.md`
+  if (repoPath(check.reviewPath) !== reviewPath) {
+    openQuestions.push(`design-check ${pathProblem(check.reviewPath, reviewPath)}: its findings below may not be in ${reviewPath}`)
+  }
+  const where = repoPath(check.reviewPath) || check.reviewPath
+  log(`design-check: ${check.findings.length} findings in ${where}`)
   for (const f of check.findings) {
-    openQuestions.push(`design-check ${f.id} (${f.severity}): ${f.summary} [${check.reviewPath}]`)
+    openQuestions.push(`design-check ${f.id} (${f.severity}): ${f.summary} [${where}]`)
   }
 }
 
-return { designPath, adrPath: design.adrPath, openQuestions }
+return { designPath, adrPath, openQuestions }
