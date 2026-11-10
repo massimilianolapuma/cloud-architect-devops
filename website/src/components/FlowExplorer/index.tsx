@@ -2,7 +2,7 @@ import React, {useMemo, useState} from 'react';
 import clsx from 'clsx';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import {ReactFlow, Position, type Edge, type Node} from '@xyflow/react';
+import {ReactFlow, Handle, MarkerType, Position, type Edge, type Node, type NodeProps} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import type {Flow, L} from './flow-schema.mjs';
 import styles from './styles.module.css';
@@ -12,16 +12,33 @@ const COPY = {
   it: {back: 'Indietro', next: 'Avanti', involved: 'Coinvolti', stepOf: (n: number, t: number) => `Passo ${n} di ${t}`},
 } as const;
 
+// Must match the node width in styles.module.css.
+const NODE_WIDTH = 104;
+
+// Four handles per node so an edge can leave to the right (target further along the row)
+// or from the bottom (target on a lower row), chosen from the node positions in the data.
+function StepNode({data}: NodeProps) {
+  return (
+    <>
+      <Handle id="l" type="target" position={Position.Left} isConnectable={false} />
+      <Handle id="t" type="target" position={Position.Top} isConnectable={false} />
+      {String(data.label)}
+      <Handle id="r" type="source" position={Position.Right} isConnectable={false} />
+      <Handle id="b" type="source" position={Position.Bottom} isConnectable={false} />
+    </>
+  );
+}
+const nodeTypes = {step: StepNode};
+
 function Canvas({flow, locale, highlight}: {flow: Flow; locale: 'en' | 'it'; highlight: Set<string>}) {
   const nodes: Node[] = useMemo(
     () =>
       flow.nodes.map((n) => ({
         id: n.id,
         position: {x: n.x, y: n.y},
+        type: 'step',
         data: {label: n.label[locale]},
         className: clsx(styles.node, highlight.has(n.id) ? styles.nodeOn : styles.nodeOff),
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
         draggable: false,
         selectable: false,
         connectable: false,
@@ -34,7 +51,14 @@ function Canvas({flow, locale, highlight}: {flow: Flow; locale: 'en' | 'it'; hig
     () =>
       flow.edges.map((e) => {
         const on = highlight.has(e.to);
+        const color = on ? 'var(--ifm-color-primary)' : 'var(--ifm-color-emphasis-500)';
+        const a = flow.nodes.find((n) => n.id === e.from)!;
+        const b = flow.nodes.find((n) => n.id === e.to)!;
+        const sideways = b.x >= a.x + NODE_WIDTH;
         return {
+          sourceHandle: sideways ? 'r' : 'b',
+          targetHandle: sideways ? 'l' : 't',
+          markerEnd: {type: MarkerType.ArrowClosed, color, width: 18, height: 18},
           id: `${e.from}->${e.to}`,
           source: e.from,
           target: e.to,
@@ -50,9 +74,10 @@ function Canvas({flow, locale, highlight}: {flow: Flow; locale: 'en' | 'it'; hig
   return (
     <ReactFlow
       nodes={nodes}
+      nodeTypes={nodeTypes}
       edges={edges}
       fitView
-      fitViewOptions={{padding: 0.04, maxZoom: 1.2}}
+      fitViewOptions={{padding: 0.04, maxZoom: 1.1}}
       nodesDraggable={false}
       nodesConnectable={false}
       nodesFocusable={false}

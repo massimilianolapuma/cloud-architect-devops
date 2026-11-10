@@ -21,7 +21,7 @@
         "it": "Ricerca (GCP)"
       },
       "x": 0,
-      "y": 80
+      "y": 70
     },
     {
       "id": "research-onprem",
@@ -30,7 +30,7 @@
         "it": "Ricerca (on-prem/CNCF)"
       },
       "x": 0,
-      "y": 160
+      "y": 140
     },
     {
       "id": "design",
@@ -38,8 +38,8 @@
         "en": "Design",
         "it": "Design"
       },
-      "x": 146,
-      "y": 80
+      "x": 154,
+      "y": 70
     },
     {
       "id": "approval",
@@ -47,8 +47,8 @@
         "en": "Your approval",
         "it": "La tua approvazione"
       },
-      "x": 292,
-      "y": 80
+      "x": 308,
+      "y": 70
     },
     {
       "id": "write",
@@ -56,8 +56,8 @@
         "en": "Write",
         "it": "Scrittura"
       },
-      "x": 438,
-      "y": 0
+      "x": 0,
+      "y": 340
     },
     {
       "id": "diagrams",
@@ -65,8 +65,8 @@
         "en": "Diagrams",
         "it": "Diagrammi"
       },
-      "x": 438,
-      "y": 80
+      "x": 154,
+      "y": 340
     },
     {
       "id": "runnable",
@@ -74,8 +74,8 @@
         "en": "Runnable piece",
         "it": "Parte eseguibile"
       },
-      "x": 438,
-      "y": 160
+      "x": 308,
+      "y": 340
     },
     {
       "id": "verify",
@@ -83,8 +83,8 @@
         "en": "Verify",
         "it": "Verifica"
       },
-      "x": 584,
-      "y": 80
+      "x": 0,
+      "y": 450
     },
     {
       "id": "review",
@@ -92,8 +92,8 @@
         "en": "Adversarial review",
         "it": "Revisione avversariale"
       },
-      "x": 730,
-      "y": 80
+      "x": 154,
+      "y": 450
     },
     {
       "id": "translate",
@@ -101,8 +101,8 @@
         "en": "Translate",
         "it": "Traduzione"
       },
-      "x": 876,
-      "y": 80
+      "x": 308,
+      "y": 450
     }
   ],
   "edges": [

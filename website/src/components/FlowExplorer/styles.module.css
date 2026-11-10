@@ -17,8 +17,7 @@
 
 .canvas,
 .placeholder {
-  height: 260px;
-  min-width: 640px;
+  height: 520px;
 }
 
 /* React Flow reads these; keep it quiet and theme-bound. */
@@ -41,7 +40,7 @@
 }
 
 .node {
-  width: 120px;
+  width: 104px;
   padding: 7px 4px;
   border-radius: 6px;
   border: 1px solid var(--fx-line);
@@ -55,7 +54,7 @@
 }
 
 .nodeOff {
-  opacity: 0.78;
+  opacity: 0.88;
 }
 
 .nodeOn {
@@ -67,7 +66,7 @@
 
 .edgeOff :global(.react-flow__edge-path) {
   stroke: var(--ifm-color-emphasis-400);
-  stroke-width: 1.5;
+  stroke-width: 1.75;
   transition: stroke 0.2s;
 }
 .edgeOn :global(.react-flow__edge-path) {
@@ -175,6 +174,10 @@
 }
 
 @media (max-width: 480px) {
+  .canvas,
+  .placeholder {
+    height: 410px;
+  }
   .panel {
     padding: 0.9rem 0.9rem 1rem;
   }
