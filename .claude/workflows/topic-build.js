@@ -244,7 +244,8 @@ log(`review: ${review.findings.length} findings, ${toFix.length} blocker/major`)
 // ---------------------------------------------------------------------------
 phase('Fix')
 let fix = null
-const needsFix = toFix.length > 0 || !firstPassed
+const pendingEmbeds = diagrams ? diagrams.embedsNotInserted : []
+const needsFix = toFix.length > 0 || !firstPassed || pendingEmbeds.length > 0
 if (needsFix) {
   const verifierInput = !firstVerify
     ? 'The pre-translation verifier did not complete: there is no gate output.'
@@ -253,8 +254,8 @@ if (needsFix) {
       : 'The pre-translation verifier (every gate except task i18n:check) failed. Fix the failures in files you may edit ' +
         `and list the others in gateFailuresNotFixed. Its raw output:\n\n${firstVerify.report}`
   const extra = []
-  if (diagrams && diagrams.embedsNotInserted.length) {
-    extra.push(`The diagrammer could not insert these embed lines; make sure each is in the chapter:\n${diagrams.embedsNotInserted.join('\n')}`)
+  if (pendingEmbeds.length) {
+    extra.push(`The diagrammer could not insert these embed lines; make sure each is in the chapter:\n${pendingEmbeds.join('\n')}`)
   }
   fix = await agent(
     `mode: fix\ntopic: ${topic}\ntitle: ${a.title}\nchapter: ${chapterPath}\nADR: ${adrPath}\nreview: ${review.reviewPath}\n\n` +
@@ -268,7 +269,7 @@ if (needsFix) {
   addFiles(fix.files)
   fix.gateFailuresNotFixed.forEach((g) => log(`fix: gate failure not fixed: ${g}`))
 } else {
-  log('fix skipped: no blocker or major finding and the pre-translation verify passed')
+  log('fix skipped: no blocker or major finding, no pending diagram embed, and the pre-translation verify passed')
 }
 
 // Findings that stay open after the single fix round. A finding counts as resolved only
