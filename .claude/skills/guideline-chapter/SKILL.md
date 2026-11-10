@@ -35,9 +35,9 @@ A chapter gives three audiences what they need: **Understand** (stakeholders), *
 4. **Understand**: problem, why it matters, outcome, in plain language; explain every term a non-engineer would not know. Embed each diagram design.md plans for this view, at its exact path: `![<what the diagram shows>](pathname:///diagrams/<section>/<name>.svg)`. The `pathname://` prefix is mandatory. If design.md plans a flow, add after the frontmatter and before the H1:
    ```mdx
    import FlowExplorer from '@site/src/components/FlowExplorer';
-   import myFlow from '@site/src/data/flows/<name>.json';
+   import releaseRollback from '@site/src/data/flows/release-rollback.json';
    ```
-   and `<FlowExplorer flow={myFlow} />` where it belongs.
+   and `<FlowExplorer flow={releaseRollback} />` where it belongs. The import identifier is the camelCase of the flow file name `<name>` (`release-rollback` becomes `releaseRollback`); the diagrammer inserts the same lines, so use exactly this identifier.
 5. **Decide**: every option in design.md (at least two), the weighted matrix (weights sum to 100, scores 1 to 5, each total = sum of weight x score; recompute every total yourself), the recommendation with its two or three deciding reasons, "When to deviate" with concrete conditions, and the decision record linking the real ADR: `[ADR NNNN](../adr/NNNN-kebab-title.md)`. If the ADR mentions this chapter as a code span and its `status` is `proposed`, turn the mention into a link now that the chapter exists; if its status is anything else, do not edit the ADR and report the change instead (skill `adr-author`, rule 1).
 6. **Copy**: name the runnable piece as a code span (`reference/<area>/<piece>/`), one sentence on what it does, the command (`task <name>`), then the adoption checklist. Do **not** make it a Markdown link: links from `website/docs/` to files outside it break `task site:build`. If design.md says the runnable piece is `none`, say there is none and why, and keep a checklist.
 7. **Verification status**: two bullets, "Exercised live locally" (each item: command, date, result, from the evidence in rule 2; "None yet" if there is none) and "Not exercised" (everything else, including all cloud-only parts).

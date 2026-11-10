@@ -58,7 +58,7 @@ import FlowExplorer from '@site/src/components/FlowExplorer';
 import releaseRollback from '@site/src/data/flows/release-rollback.json';
 ```
 
-Then `<FlowExplorer flow={releaseRollback} />` on its own line, separated by blank lines, where the chapter discusses it. The import identifier is the camelCase of `<name>`. The Italian `.mdx` gets the same lines unchanged from the translator. If the chapter already has these lines (the author may have added them from design.md), leave them.
+Then `<FlowExplorer flow={releaseRollback} />` on its own line, separated by blank lines, where the chapter discusses it. The import identifier is the camelCase of the flow file name `<name>` (`release-rollback` becomes `releaseRollback`); the chapter author uses the same rule, so the lines never differ. The Italian `.mdx` gets the same lines unchanged from the translator. If the chapter already has these lines (the author may have added them from design.md), leave them.
 
 ## Done only when
 

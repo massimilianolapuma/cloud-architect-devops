@@ -220,7 +220,7 @@ addFiles([chapterPath, adrPath, ...chapter.files])
 phase('Verify')
 // Italian files do not exist yet, so i18n:check is excluded by design; the final verify runs it.
 const firstVerify = await agent(
-  `Mode: pre-translation. The translator has not run yet: run every gate except task i18n:check.`,
+  `Mode: pre-translation. Run every gate except task i18n:check.`,
   { agentType: 'verifier', label: 'verify (pre-translation)', phase: 'Verify', schema: VERIFY_SCHEMA },
 )
 const firstPassed = !!firstVerify && passed(firstVerify)

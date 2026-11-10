@@ -53,9 +53,9 @@ Vedi [ADR 0001](../adr/0001-kebab-title.md).
 
 ## Copiare
 
-_Guidance: per il team di delivery. Collega il pezzo eseguibile (percorso sotto `reference/` o `templates/`), di' in una frase cosa fa e indica il comando per eseguirlo. Poi la checklist di adozione._
+_Guidance: per il team di delivery. Indica il pezzo eseguibile (percorso sotto `reference/` o `templates/`; scrivi il percorso come code span, non come link), di' in una frase cosa fa e indica il comando per eseguirlo. Poi la checklist di adozione._
 
-Template eseguibile: [path/to/template](../../reference/path/to/template).
+Template eseguibile: `reference/path/to/template`
 
 - [ ] Prerequisito o primo passo
 - [ ] Adatta i parametri al tuo ambiente

@@ -53,9 +53,9 @@ See [ADR 0001](../adr/0001-kebab-title.md).
 
 ## Copy
 
-_Guidance: for the delivery team. Link the runnable piece (path under `reference/` or `templates/`), say what it does in one sentence and give the command to run it. Then the adoption checklist._
+_Guidance: for the delivery team. Name the runnable piece (path under `reference/` or `templates/`; write the path as a code span, not a link), say what it does in one sentence and give the command to run it. Then the adoption checklist._
 
-Runnable template: [path/to/template](../../reference/path/to/template).
+Runnable template: `reference/path/to/template`
 
 - [ ] Prerequisite or first step
 - [ ] Adapt the parameters to your environment

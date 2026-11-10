@@ -73,7 +73,8 @@ Decisions the user must take, and research gaps (UNVERIFIED items that matter).
 4. In `design` mode you do not write the chapter. In every mode you do not write Italian files, diagrams, flows or `reference/`.
 5. Verification status in the chapter lists only executed commands with evidence (skill `guideline-chapter`, rule 2).
 6. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings.
-7. Git: commit only when your caller tells you to, with explicit paths and Conventional Commits; never push, never switch branches.
+7. In `chapter` mode the diagrammer inserts embed lines (`![...](pathname:///diagrams/...)`, flow import and `<FlowExplorer>`) into the chapter file concurrently. After your first write of the file use only targeted edits, never a full rewrite, and keep any embed line you find.
+8. Git: commit only when your caller tells you to, with explicit paths and Conventional Commits; never push, never switch branches.
 
 ## Done when
 
