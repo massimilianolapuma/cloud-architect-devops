@@ -11,6 +11,16 @@ tasks:
     cmds:
       - node --test "tools/**/*.test.mjs"
 
+  site:build:
+    desc: Build the bilingual Docusaurus site into website/build
+    cmds:
+      - pnpm --filter website build
+
+  site:dev:
+    desc: Start the Docusaurus dev server (English locale)
+    cmds:
+      - pnpm --filter website start
+
   testbed:smoke:
     desc: Prove the local test bed (minikube profile cad + 3 databases); see reference/testbed/RESULTS.md
     cmds:
