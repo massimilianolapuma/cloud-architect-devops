@@ -9,7 +9,7 @@ tasks:
   test:tools:
     desc: Run unit tests for tools/
     cmds:
-      - node --test "tools/**/*.test.mjs"
+      - node --test "tools/**/*.test.mjs" "website/src/**/*.test.mjs"
 
   i18n:check:
     desc: Fail if any Italian doc is missing, orphaned or stale versus English
@@ -20,6 +20,11 @@ tasks:
     desc: Fail if a chapter or ADR lacks its required frontmatter or sections
     cmds:
       - node tools/content-lint.mjs
+
+  flows:check:
+    desc: Fail if an interactive flow in website/src/data/flows is malformed
+    cmds:
+      - node tools/flows.mjs
 
   diagrams:export:
     desc: Export new or changed diagrams/*.drawio to SVG under website/static/diagrams

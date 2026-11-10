@@ -2,8 +2,11 @@
 doc_type: page
 title: Introduzione
 slug: /
-source_sha256: a01a193b528b8b283fae7a10df0941f3496dc987f0bfc74ebbcb7e2d65a06878
+source_sha256: 251c6f182f3463f28efe278680de142ee64969e0337be03203e4fd7affc405fb
 ---
+
+import FlowExplorer from '@site/src/components/FlowExplorer';
+import agenticChain from '@site/src/data/flows/agentic-chain.json';
 
 # Linee guida per Cloud Architect e DevOps
 
@@ -28,6 +31,8 @@ Ogni capitolo offre le stesse tre viste:
 ## Come nasce un argomento
 
 Un argomento attraversa due workflow agentici con un'approvazione umana nel mezzo. `topic-design` esegue ricerche in parallelo e produce un design con matrice decisionale e bozza di ADR. Dopo l'approvazione, `topic-build` scrive il capitolo, disegna i diagrammi, aggiunge la parte eseguibile, la verifica, esegue una revisione avversariale e produce la traduzione italiana.
+
+<FlowExplorer flow={agenticChain} />
 
 ```mermaid
 flowchart LR

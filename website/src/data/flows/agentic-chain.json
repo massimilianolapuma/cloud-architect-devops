@@ -1,0 +1,255 @@
+{
+  "id": "agentic-chain",
+  "title": {
+    "en": "How a topic is produced",
+    "it": "Come nasce un argomento"
+  },
+  "nodes": [
+    {
+      "id": "research-azure",
+      "label": {
+        "en": "Research (Azure)",
+        "it": "Ricerca (Azure)"
+      },
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "research-gcp",
+      "label": {
+        "en": "Research (GCP)",
+        "it": "Ricerca (GCP)"
+      },
+      "x": 0,
+      "y": 80
+    },
+    {
+      "id": "research-onprem",
+      "label": {
+        "en": "Research (on-prem/CNCF)",
+        "it": "Ricerca (on-prem/CNCF)"
+      },
+      "x": 0,
+      "y": 160
+    },
+    {
+      "id": "design",
+      "label": {
+        "en": "Design",
+        "it": "Design"
+      },
+      "x": 146,
+      "y": 80
+    },
+    {
+      "id": "approval",
+      "label": {
+        "en": "Your approval",
+        "it": "La tua approvazione"
+      },
+      "x": 292,
+      "y": 80
+    },
+    {
+      "id": "write",
+      "label": {
+        "en": "Write",
+        "it": "Scrittura"
+      },
+      "x": 438,
+      "y": 0
+    },
+    {
+      "id": "diagrams",
+      "label": {
+        "en": "Diagrams",
+        "it": "Diagrammi"
+      },
+      "x": 438,
+      "y": 80
+    },
+    {
+      "id": "runnable",
+      "label": {
+        "en": "Runnable piece",
+        "it": "Parte eseguibile"
+      },
+      "x": 438,
+      "y": 160
+    },
+    {
+      "id": "verify",
+      "label": {
+        "en": "Verify",
+        "it": "Verifica"
+      },
+      "x": 584,
+      "y": 80
+    },
+    {
+      "id": "review",
+      "label": {
+        "en": "Adversarial review",
+        "it": "Revisione avversariale"
+      },
+      "x": 730,
+      "y": 80
+    },
+    {
+      "id": "translate",
+      "label": {
+        "en": "Translate",
+        "it": "Traduzione"
+      },
+      "x": 876,
+      "y": 80
+    }
+  ],
+  "edges": [
+    {
+      "from": "research-azure",
+      "to": "design"
+    },
+    {
+      "from": "research-gcp",
+      "to": "design"
+    },
+    {
+      "from": "research-onprem",
+      "to": "design"
+    },
+    {
+      "from": "design",
+      "to": "approval"
+    },
+    {
+      "from": "approval",
+      "to": "write"
+    },
+    {
+      "from": "approval",
+      "to": "diagrams"
+    },
+    {
+      "from": "approval",
+      "to": "runnable"
+    },
+    {
+      "from": "write",
+      "to": "verify"
+    },
+    {
+      "from": "diagrams",
+      "to": "verify"
+    },
+    {
+      "from": "runnable",
+      "to": "verify"
+    },
+    {
+      "from": "verify",
+      "to": "review"
+    },
+    {
+      "from": "review",
+      "to": "translate"
+    }
+  ],
+  "steps": [
+    {
+      "title": {
+        "en": "Three researchers work in parallel",
+        "it": "Tre ricercatori lavorano in parallelo"
+      },
+      "body": {
+        "en": "Separate agents study the topic for Azure, for GCP and for on-prem with CNCF tooling. None of them sees the others' conclusions yet.",
+        "it": "Agenti separati studiano l'argomento per Azure, per GCP e per l'on-prem con strumenti CNCF. Nessuno vede ancora le conclusioni degli altri."
+      },
+      "highlight": [
+        "research-azure",
+        "research-gcp",
+        "research-onprem"
+      ]
+    },
+    {
+      "title": {
+        "en": "A design is written",
+        "it": "Viene scritto un design"
+      },
+      "body": {
+        "en": "The findings become options, a weighted decision matrix and a draft ADR. This is the end of the topic-design workflow.",
+        "it": "Le ricerche diventano opzioni, una matrice decisionale pesata e una bozza di ADR. Qui finisce il workflow topic-design."
+      },
+      "highlight": [
+        "design"
+      ]
+    },
+    {
+      "title": {
+        "en": "You approve",
+        "it": "Approvi tu"
+      },
+      "body": {
+        "en": "Nothing is built until a person approves the design. The topic-build workflow starts only from this point.",
+        "it": "Nulla viene costruito finché una persona non approva il design. Il workflow topic-build parte solo da qui."
+      },
+      "highlight": [
+        "approval"
+      ]
+    },
+    {
+      "title": {
+        "en": "Three things are built in parallel",
+        "it": "Tre parti vengono costruite in parallelo"
+      },
+      "body": {
+        "en": "The chapter is written, the diagrams are drawn and the runnable piece is built at the same time.",
+        "it": "Il capitolo viene scritto, i diagrammi vengono disegnati e la parte eseguibile viene costruita nello stesso momento."
+      },
+      "highlight": [
+        "write",
+        "diagrams",
+        "runnable"
+      ]
+    },
+    {
+      "title": {
+        "en": "Verification gates run",
+        "it": "Scattano i controlli di verifica"
+      },
+      "body": {
+        "en": "Automated gates check the content, the diagram exports, the translation parity and the site build.",
+        "it": "Controlli automatici verificano i contenuti, l'esportazione dei diagrammi, la parità delle traduzioni e la build del sito."
+      },
+      "highlight": [
+        "verify"
+      ]
+    },
+    {
+      "title": {
+        "en": "An adversarial reviewer tries to break it",
+        "it": "Un revisore avversariale prova a smontarlo"
+      },
+      "body": {
+        "en": "The reviewer has not seen the author's reasoning, so it judges only what is on the page.",
+        "it": "Il revisore non ha visto il ragionamento dell'autore, quindi giudica solo ciò che c'è sulla pagina."
+      },
+      "highlight": [
+        "review"
+      ]
+    },
+    {
+      "title": {
+        "en": "The Italian translation is made",
+        "it": "Viene prodotta la traduzione italiana"
+      },
+      "body": {
+        "en": "English is canonical. The Italian version is translated last and stamped so that drift is detected.",
+        "it": "L'inglese è la fonte canonica. La versione italiana viene tradotta per ultima e timbrata, così ogni scostamento viene rilevato."
+      },
+      "highlight": [
+        "translate"
+      ]
+    }
+  ]
+}

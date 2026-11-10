@@ -4,6 +4,9 @@ title: Introduction
 slug: /
 ---
 
+import FlowExplorer from '@site/src/components/FlowExplorer';
+import agenticChain from '@site/src/data/flows/agentic-chain.json';
+
 # Cloud Architect & DevOps Guidelines
 
 This repository publishes enterprise architecture guidelines: multi-tenant design, cloud-agnostic design, delivery, database rollback and business continuity. Each guideline is backed by a decision record and, where it applies, by a template that runs.
@@ -27,6 +30,8 @@ Every chapter offers the same three views:
 ## How a topic is produced
 
 A topic goes through two agentic workflows with a human approval in between. `topic-design` runs parallel research and produces a design with a decision matrix and a draft ADR. After approval, `topic-build` writes the chapter, draws the diagrams, adds the runnable piece, verifies it, runs an adversarial review and produces the Italian translation.
+
+<FlowExplorer flow={agenticChain} />
 
 ```mermaid
 flowchart LR

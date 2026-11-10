@@ -1,0 +1,193 @@
+.explorer {
+  --fx-surface: var(--ifm-background-surface-color);
+  --fx-line: var(--ifm-color-emphasis-300);
+  --fx-accent: var(--ifm-color-primary);
+  margin: 1.5rem 0;
+  border: 1px solid var(--fx-line);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-color);
+  overflow: hidden;
+}
+
+.scroller {
+  overflow-x: auto;
+  border-bottom: 1px solid var(--fx-line);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.canvas,
+.placeholder {
+  height: 260px;
+  min-width: 640px;
+}
+
+/* React Flow reads these; keep it quiet and theme-bound. */
+.canvas :global(.react-flow) {
+  --xy-edge-stroke-default: var(--ifm-color-emphasis-400);
+  background: transparent;
+}
+.canvas :global(.react-flow__attribution) {
+  background: transparent;
+  font-size: 9px;
+  opacity: 0.6;
+}
+.canvas :global(.react-flow__handle) {
+  opacity: 0;
+  pointer-events: none;
+}
+.canvas :global(.react-flow__pane),
+.canvas :global(.react-flow__node) {
+  cursor: default;
+}
+
+.node {
+  width: 120px;
+  padding: 7px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--fx-line);
+  background: var(--fx-surface);
+  color: var(--ifm-font-color-base);
+  font-family: var(--ifm-font-family-base);
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: center;
+  transition: opacity 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.nodeOff {
+  opacity: 0.78;
+}
+
+.nodeOn {
+  border: 2px solid var(--fx-accent);
+  background: color-mix(in srgb, var(--fx-accent) 22%, var(--fx-surface));
+  font-weight: 700;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--fx-accent) 28%, transparent);
+}
+
+.edgeOff :global(.react-flow__edge-path) {
+  stroke: var(--ifm-color-emphasis-400);
+  stroke-width: 1.5;
+  transition: stroke 0.2s;
+}
+.edgeOn :global(.react-flow__edge-path) {
+  stroke: var(--fx-accent);
+  stroke-width: 2.5;
+  transition: stroke 0.2s;
+}
+
+.panel {
+  padding: 1rem 1.25rem 1.1rem;
+}
+
+.progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.9rem;
+}
+.tick {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ifm-color-emphasis-300);
+  transition: background-color 0.2s;
+}
+.tickDone {
+  background: color-mix(in srgb, var(--fx-accent) 50%, var(--ifm-color-emphasis-300));
+}
+.tickNow {
+  background: var(--fx-accent);
+}
+
+.live {
+  min-height: 8.5rem;
+}
+.counter {
+  margin: 0 0 0.2rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700);
+}
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+.body {
+  margin: 0 0 0.5rem;
+  max-width: 62ch;
+}
+.involved {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+.involvedLabel {
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+.button {
+  min-width: 6.5rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-500);
+  border-radius: var(--ifm-global-radius);
+  background: var(--fx-surface);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.button:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-200);
+}
+.buttonPrimary {
+  border-color: var(--ifm-color-primary-darker);
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-content-inverse);
+}
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+.button:focus-visible {
+  outline: 3px solid var(--ifm-color-primary-darkest);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--ifm-background-color);
+}
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 0.9rem 0.9rem 1rem;
+  }
+  .buttons .button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node,
+  .edgeOn :global(.react-flow__edge-path),
+  .edgeOff :global(.react-flow__edge-path),
+  .tick {
+    transition: none;
+  }
+}
