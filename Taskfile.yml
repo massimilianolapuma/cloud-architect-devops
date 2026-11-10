@@ -1,0 +1,12 @@
+version: '3'
+
+tasks:
+  doctor:
+    desc: Check that required tools are installed and healthy
+    cmds:
+      - node tools/doctor.mjs
+
+  test:tools:
+    desc: Run unit tests for tools/
+    cmds:
+      - node --test "tools/**/*.test.mjs"
