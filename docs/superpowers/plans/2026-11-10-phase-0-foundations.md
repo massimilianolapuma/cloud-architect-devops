@@ -487,6 +487,42 @@ Contiene: scopo del repo e tre pubblici; mappa delle cartelle; regole fisse (nes
 
 ---
 
+### Task 10b: Macchina Podman dedicata `cad` (aggiunto il 2026-11-10 dopo il Task 2)
+
+Decisione dell'utente: il banco di prova del progetto vive in una macchina Podman dedicata, separata dalla sua `podman-machine-default`. Fatti accertati: Podman ammette una sola macchina attiva alla volta; SQL Server 2022 va in crash sotto QEMU nella macchina `libkrun` e funziona sotto Rosetta in una macchina `applehv`; Rosetta si attiva con `[machine] rosetta = true` letto da `podman machine init`.
+
+**Files:**
+- Create: `reference/testbed/podman/containers.rosetta.conf`
+- Modify: `Taskfile.yml` (task `machine:init`, `machine:status`), `reference/testbed/smoke.sh`, `reference/testbed/RESULTS.md`, `docs/superpowers/specs/2026-11-10-cloud-architect-devops-design.md`
+
+**Interfaces:**
+- Produces: macchina Podman `cad` (provider `applehv`, Rosetta, 6 CPU, 16 GiB, 60 GB). `task machine:status` esce con 0 solo se `cad` è la macchina in esecuzione, altrimenti 1 con la riga `project machine "cad" is not active`.
+- Produces: regola per tutte le fasi successive — ogni task che usa container o cluster dipende da `machine:status`.
+
+- [ ] **Step 1: `containers.rosetta.conf` e i due task**
+
+Il file contiene solo `[machine]` con `rosetta = true`. `machine:init` crea `cad` passando il file con `CONTAINERS_CONF_OVERRIDE`, senza avviarla e senza `--update-connection`; se `cad` esiste già non fa nulla. **Nessun task avvia, ferma o cambia macchina**: lo scambio lo fa l'utente. Il `containers.conf` dell'utente non viene mai modificato.
+
+- [ ] **Step 2: `smoke.sh` dentro la macchina dedicata**
+
+Lo script parte da `machine:status` e si rifiuta di girare altrove. Usa la connessione `cad` in modo esplicito per ogni comando `podman`/`docker` e per minikube. Tolto il ramo "due modalità" di SQL Server: una sola, `--platform linux/amd64`, con uscita immediata se il container termina.
+
+- [ ] **Step 3: Finestra concessa dall'utente — fermarsi e chiedere**
+
+Per eseguire serve che l'utente fermi la sua macchina e avvii `cad` (oppure autorizzi a farlo in quel momento): si fermano il suo `minikube` e i suoi container. Non procedere senza il suo via.
+
+- [ ] **Step 4: Eseguire**
+
+Run: `task testbed:smoke` — Expected: exit 0, tutte e 7 le asserzioni verdi, compresa SQL Server (6) e la memoria con tutto acceso (7).
+
+- [ ] **Step 5: Aggiornare `RESULTS.md` e la spec**
+
+`RESULTS.md`: nuova esecuzione con data, macchina, esito delle 7 asserzioni, memoria misurata, regola per `task e2e`. Spec: nella tabella delle decisioni dell'utente la riga "Macchina Podman dedicata"; nei prerequisiti, tolti i tre rischi ora chiusi. Rimuovere la macchina di prova `cad-mssql`.
+
+- [ ] **Step 6: Smontare, restituire la macchina all'utente, commit** — `task testbed:down`, poi `git commit -m "test: run test bed in dedicated podman machine with sql server"`
+
+---
+
 ### Task 11: Pilota — due capitoli veri attraverso la catena
 
 **Files:**
