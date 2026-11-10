@@ -11,6 +11,18 @@ tasks:
     cmds:
       - node --test "tools/**/*.test.mjs" "website/src/**/*.test.mjs"
 
+  verify:
+    desc: Run every gate in order and stop at the first failure
+    cmds:
+      - task: doctor
+      - task: test:tools
+      - task: content:lint
+      - task: i18n:check
+      - task: diagrams:check
+      - task: flows:check
+      - task: agentic:lint
+      - task: site:build
+
   i18n:check:
     desc: Fail if any Italian doc is missing, orphaned or stale versus English
     cmds:
