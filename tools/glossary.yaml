@@ -1,0 +1,14 @@
+# EN -> IT glossary. keep_english: true means the term stays in English in Italian text.
+- { en: tenant, it: tenant, keep_english: true }
+- { en: control plane, it: control plane, keep_english: true }
+- { en: rollback, it: rollback, keep_english: true }
+- { en: deployment, it: deployment, keep_english: true }
+- { en: pipeline, it: pipeline, keep_english: true }
+- { en: trunk-based, it: trunk-based, keep_english: true }
+- { en: feature flag, it: feature flag, keep_english: true }
+- { en: GitOps, it: GitOps, keep_english: true }
+- { en: namespace, it: namespace, keep_english: true }
+- { en: cluster, it: cluster, keep_english: true }
+- { en: business continuity, it: continuità operativa, keep_english: false }
+- { en: disaster recovery, it: ripristino da disastro, keep_english: false }
+- { en: noisy neighbour, it: vicino rumoroso, keep_english: false }

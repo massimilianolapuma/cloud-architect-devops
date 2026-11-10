@@ -2,6 +2,7 @@
 doc_type: page
 title: Introduzione
 slug: /
+source_sha256: e03d941164d7aaf2f4acc1eced525ac727b77580b774e29f5b1e371739e7ec3c
 ---
 
 # Linee guida per Cloud Architect e DevOps

@@ -11,6 +11,11 @@ tasks:
     cmds:
       - node --test "tools/**/*.test.mjs"
 
+  i18n:check:
+    desc: Fail if any Italian doc is missing, orphaned or stale versus English
+    cmds:
+      - node tools/i18n-parity.mjs check
+
   site:build:
     desc: Build the bilingual Docusaurus site into website/build
     cmds:
