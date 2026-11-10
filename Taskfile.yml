@@ -16,6 +16,11 @@ tasks:
     cmds:
       - node tools/i18n-parity.mjs check
 
+  content:lint:
+    desc: Fail if a chapter or ADR lacks its required frontmatter or sections
+    cmds:
+      - node tools/content-lint.mjs
+
   diagrams:export:
     desc: Export new or changed diagrams/*.drawio to SVG under website/static/diagrams
     cmds:
