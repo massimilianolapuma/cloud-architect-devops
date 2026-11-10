@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Rules for every Claude Code session and agent in this repository. They are exact; follow them literally.
+Rules for every Claude Code session and agent in this repository. They are exact; follow them literally. If any rule below blocks what you were asked to do, stop, do not work around it, and report which rule and why.
 
 ## Purpose
 
@@ -29,7 +29,8 @@ Guideline content lives in `website/docs/`, never in the root `docs/`.
 2. **Podman.** The test bed (minikube profile `cad`, PostgreSQL, MongoDB, SQL Server) runs in a DEDICATED Podman machine named `cad` (provider `applehv`, Rosetta). Podman allows one active machine at a time, so `cad` and the user's default machine never run together.
    - Never start, stop or switch Podman machines. Never change Podman configuration (`podman system connection`, `podman machine init/set/rm/start/stop`, `containers.conf`) without the user's explicit go-ahead at that moment.
    - Before any container or cluster work run `podman machine list` (or `task machine:status` once that task exists). If `cad` is not the running machine, stop and report. Do not use the default machine as a substitute.
-   - The machine `cad` and the `machine:status` task are created by a later task; say "when it exists" until then.
+   - The machine `cad` and the `machine:status` task are not available yet: treat them as absent.
+   - The existing `testbed:*` tasks still target the user's default Podman machine and must not be run by agents until they have been moved to the machine `cad` (a later task does this and will remove this sentence). `ref:*` tasks require `cad` to be the running machine.
 3. **Kubernetes.** Never touch kube context `dol-lab-aks`. Never stop, modify or delete minikube profile `minikube`. Always pass `--context cad` / `-p cad` explicitly.
 4. **Git.** No `git push` without the user's confirmation. Commit on feature branches, Conventional Commits, `git add` with explicit paths (never `git add -A` or `.`).
 5. **Status is the user's.** Only the user changes a document's `status` (ADR to `accepted`, chapter to `reviewed` / `approved`) and a chapter's `last_reviewed` after creation. A new chapter is `draft` with `last_reviewed` = today; a new ADR is `proposed`.
