@@ -1,0 +1,18 @@
+[
+  { "name": "node", "cmd": "node", "versionArgs": ["--version"], "versionPattern": "v(\\d+\\.\\d+\\.\\d+)", "min": "22.0.0", "required": true, "install": "brew install node" },
+  { "name": "pnpm", "cmd": "pnpm", "versionArgs": ["--version"], "versionPattern": "(\\d+\\.\\d+\\.\\d+)", "min": "10.0.0", "required": true, "install": "brew install pnpm" },
+  { "name": "task", "cmd": "task", "versionArgs": ["--version"], "versionPattern": "(\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew install go-task" },
+  { "name": "docker", "cmd": "docker", "versionArgs": ["--version"], "versionPattern": "Docker version (\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew install --cask docker" },
+  { "name": "minikube", "cmd": "minikube", "versionArgs": ["version"], "versionPattern": "v(\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew install minikube" },
+  { "name": "kubectl", "cmd": "kubectl", "versionArgs": ["version", "--client"], "versionPattern": "Client Version: v(\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew install kubernetes-cli" },
+  { "name": "helm", "cmd": "helm", "versionArgs": ["version", "--short"], "versionPattern": "v(\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew install helm" },
+  { "name": "drawio", "cmd": "drawio", "versionArgs": ["--version"], "versionPattern": "(\\d+\\.\\d+\\.\\d+)", "required": true, "install": "brew reinstall --cask drawio", "note": "Probe is `drawio --version`; the desktop binary may open a GUI, so the probe runs under a timeout." },
+  { "name": "terraform", "cmd": "terraform", "versionArgs": ["version"], "versionPattern": "Terraform v(\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install terraform" },
+  { "name": "dotnet", "cmd": "dotnet", "versionArgs": ["--version"], "versionPattern": "(\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install --cask dotnet-sdk" },
+  { "name": "uv", "cmd": "uv", "versionArgs": ["--version"], "versionPattern": "uv (\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install uv" },
+  { "name": "trivy", "cmd": "trivy", "versionArgs": ["--version"], "versionPattern": "Version: (\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install trivy" },
+  { "name": "argocd", "cmd": "argocd", "versionArgs": ["version", "--client", "--short"], "versionPattern": "v(\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install argocd" },
+  { "name": "kubeconform", "cmd": "kubeconform", "versionArgs": ["-v"], "versionPattern": "v?(\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install kubeconform" },
+  { "name": "tflint", "cmd": "tflint", "versionArgs": ["--version"], "versionPattern": "TFLint version (\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install tflint" },
+  { "name": "act", "cmd": "act", "versionArgs": ["--version"], "versionPattern": "act version (\\d+\\.\\d+\\.\\d+)", "required": false, "install": "brew install act" }
+]

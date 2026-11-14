@@ -1,0 +1,91 @@
+version: '3'
+
+tasks:
+  doctor:
+    desc: Check that required tools are installed and healthy
+    cmds:
+      - node tools/doctor.mjs
+
+  test:tools:
+    desc: Run unit tests for tools/
+    cmds:
+      - node --test "tools/**/*.test.mjs" "website/src/**/*.test.mjs"
+
+  verify:
+    desc: Run every gate in order and stop at the first failure
+    cmds:
+      - task: doctor
+      - task: test:tools
+      - task: content:lint
+      - task: i18n:check
+      - task: diagrams:check
+      - task: flows:check
+      - task: agentic:lint
+      - task: site:build
+
+  i18n:check:
+    desc: Fail if any Italian doc is missing, orphaned or stale versus English
+    cmds:
+      - node tools/i18n-parity.mjs check
+
+  content:lint:
+    desc: Fail if a chapter or ADR lacks its required frontmatter or sections
+    cmds:
+      - node tools/content-lint.mjs
+
+  flows:check:
+    desc: Fail if an interactive flow in website/src/data/flows is malformed
+    cmds:
+      - node tools/flows.mjs
+
+  agentic:lint:
+    desc: Fail if a project skill, agent or saved workflow under .claude/ is missing or malformed
+    cmds:
+      - node tools/agentic-lint.mjs
+
+  diagrams:export:
+    desc: Export new or changed diagrams/*.drawio to SVG under website/static/diagrams
+    cmds:
+      - node tools/diagrams.mjs export
+
+  diagrams:check:
+    desc: Fail if a diagram source has no current SVG export, or an SVG has no source
+    cmds:
+      - node tools/diagrams.mjs check
+
+  site:build:
+    desc: Build the bilingual Docusaurus site into website/build
+    cmds:
+      - pnpm --filter website build
+
+  site:dev:
+    desc: Start the Docusaurus dev server (English locale)
+    cmds:
+      - pnpm --filter website start
+
+  testbed:smoke:
+    desc: Prove the local test bed (minikube profile cad + 3 databases); see reference/testbed/RESULTS.md
+    cmds:
+      - bash reference/testbed/smoke.sh
+
+  machine:init:
+    desc: Create the dedicated Podman machine cad (applehv + Rosetta); never starts or switches machines
+    cmds:
+      - bash reference/testbed/podman/machine.sh init
+
+  machine:status:
+    desc: Exit 0 only when the dedicated Podman machine cad is the running one
+    cmds:
+      - bash reference/testbed/podman/machine.sh status
+
+  testbed:down:
+    desc: Remove the cad-smoke-* containers and the minikube profile cad (only while machine cad is active)
+    cmds:
+      - bash reference/testbed/podman/machine.sh status
+      - |
+        orig="$(kubectl config current-context 2>/dev/null || true)"
+        for c in $(podman --connection cad ps -aq --filter 'name=^cad-smoke-'); do
+          podman --connection cad rm -f "$c"
+        done
+        CONTAINER_CONNECTION=cad minikube delete -p cad || true
+        if [ -n "$orig" ]; then kubectl config use-context "$orig" >/dev/null 2>&1 || true; fi
