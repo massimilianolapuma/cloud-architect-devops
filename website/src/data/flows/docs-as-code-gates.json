@@ -1,0 +1,257 @@
+{
+  "id": "docs-as-code-gates",
+  "title": {
+    "en": "One change, from edit to built site",
+    "it": "Una modifica, dalla stesura al sito compilato"
+  },
+  "nodes": [
+    {
+      "id": "edit-en",
+      "label": {
+        "en": "Edit English page",
+        "it": "Modifica pagina inglese"
+      },
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "diagram",
+      "label": {
+        "en": "Update diagram",
+        "it": "Aggiorna diagramma"
+      },
+      "x": 154,
+      "y": 0
+    },
+    {
+      "id": "translate",
+      "label": {
+        "en": "Translate and stamp",
+        "it": "Traduci e timbra"
+      },
+      "x": 308,
+      "y": 0
+    },
+    {
+      "id": "content-lint",
+      "label": {
+        "en": "Content shape",
+        "it": "Forma dei contenuti"
+      },
+      "x": 0,
+      "y": 170
+    },
+    {
+      "id": "i18n-check",
+      "label": {
+        "en": "Translation parity",
+        "it": "Parità traduzioni"
+      },
+      "x": 154,
+      "y": 170
+    },
+    {
+      "id": "diagrams-check",
+      "label": {
+        "en": "Diagram freshness",
+        "it": "Diagrammi aggiornati"
+      },
+      "x": 308,
+      "y": 170
+    },
+    {
+      "id": "flows-check",
+      "label": {
+        "en": "Flow check",
+        "it": "Controllo dei flussi"
+      },
+      "x": 0,
+      "y": 340
+    },
+    {
+      "id": "site-build",
+      "label": {
+        "en": "Site build",
+        "it": "Build del sito"
+      },
+      "x": 154,
+      "y": 340
+    },
+    {
+      "id": "static",
+      "label": {
+        "en": "Static folder",
+        "it": "Cartella statica"
+      },
+      "x": 308,
+      "y": 340
+    },
+    {
+      "id": "pages",
+      "label": {
+        "en": "GitHub Pages (later)",
+        "it": "GitHub Pages (dopo)"
+      },
+      "x": 308,
+      "y": 420
+    }
+  ],
+  "edges": [
+    {
+      "from": "edit-en",
+      "to": "diagram"
+    },
+    {
+      "from": "diagram",
+      "to": "translate"
+    },
+    {
+      "from": "translate",
+      "to": "content-lint"
+    },
+    {
+      "from": "content-lint",
+      "to": "i18n-check"
+    },
+    {
+      "from": "i18n-check",
+      "to": "diagrams-check"
+    },
+    {
+      "from": "diagrams-check",
+      "to": "flows-check"
+    },
+    {
+      "from": "flows-check",
+      "to": "site-build"
+    },
+    {
+      "from": "site-build",
+      "to": "static"
+    },
+    {
+      "from": "static",
+      "to": "pages"
+    }
+  ],
+  "steps": [
+    {
+      "title": {
+        "en": "Edit the English page",
+        "it": "Modifica la pagina inglese"
+      },
+      "body": {
+        "en": "Every change starts in the English file under website/docs, because English is the only source. The change is a commit in git, so it has an author and a history.",
+        "it": "Ogni modifica parte dal file inglese in website/docs, perché l'inglese è l'unica fonte. La modifica è un commit in git, quindi ha un autore e una cronologia."
+      },
+      "highlight": [
+        "edit-en"
+      ]
+    },
+    {
+      "title": {
+        "en": "Update the diagram source and export it",
+        "it": "Aggiorna il sorgente del diagramma ed esportalo"
+      },
+      "body": {
+        "en": "If the change touches a picture, edit the draw.io source under diagrams, then run task diagrams:export. It writes the SVG the site shows and records the hash of the source in diagrams/manifest.json.",
+        "it": "Se la modifica riguarda una figura, modifica il sorgente draw.io in diagrams, poi esegui task diagrams:export. Il comando scrive l'SVG mostrato dal sito e registra l'hash del sorgente in diagrams/manifest.json."
+      },
+      "highlight": [
+        "diagram"
+      ]
+    },
+    {
+      "title": {
+        "en": "Translate and stamp the Italian page",
+        "it": "Traduci e timbra la pagina italiana"
+      },
+      "body": {
+        "en": "Translate the Italian file at the same path, then stamp it with node tools/i18n-parity.mjs stamp and the page's path. The stamp is the hash of the English file as it is now, written in the Italian file as source_sha256.",
+        "it": "Traduci il file italiano allo stesso percorso, poi timbralo con node tools/i18n-parity.mjs stamp seguito dal percorso della pagina. Il timbro è l'hash del file inglese com'è in questo momento, scritto nel file italiano come source_sha256."
+      },
+      "highlight": [
+        "translate"
+      ]
+    },
+    {
+      "title": {
+        "en": "Gate: content shape (content:lint)",
+        "it": "Controllo: forma dei contenuti (content:lint)"
+      },
+      "body": {
+        "en": "From here on the gates run on your machine with task verify, which runs them in order with a few checks of the repository's own tooling and stops at the first failure. This one fails when a chapter or ADR, in either language, lacks a required frontmatter field or a required section.",
+        "it": "Da qui in poi i controlli girano sulla tua macchina con task verify, che li esegue in ordine insieme ad alcune verifiche degli strumenti del repository e si ferma al primo errore. Questo fallisce quando a un capitolo o a un ADR, in una delle due lingue, manca un campo obbligatorio del frontmatter o una sezione obbligatoria."
+      },
+      "highlight": [
+        "content-lint"
+      ]
+    },
+    {
+      "title": {
+        "en": "Gate: translation parity (i18n:check)",
+        "it": "Controllo: parità delle traduzioni (i18n:check)"
+      },
+      "body": {
+        "en": "It fails when an English page has no Italian file (missing), when an Italian file has no English page (orphan), or when the stamp in the Italian file differs from the hash of the English file (stale).",
+        "it": "Fallisce quando una pagina inglese non ha il file italiano (missing), quando un file italiano non ha la pagina inglese (orphan), oppure quando il timbro nel file italiano è diverso dall'hash del file inglese (stale)."
+      },
+      "highlight": [
+        "i18n-check"
+      ]
+    },
+    {
+      "title": {
+        "en": "Gate: diagram freshness (diagrams:check)",
+        "it": "Controllo: diagrammi aggiornati (diagrams:check)"
+      },
+      "body": {
+        "en": "It fails when a draw.io source has no exported SVG (missing), when the source changed after the last export (stale), when a source file has more than one page (multipage), or when an SVG has no source (orphan).",
+        "it": "Fallisce quando un sorgente draw.io non ha l'SVG esportato (missing), quando il sorgente è cambiato dopo l'ultima esportazione (stale), quando un file sorgente ha più di una pagina (multipage), oppure quando un SVG non ha il sorgente (orphan)."
+      },
+      "highlight": [
+        "diagrams-check"
+      ]
+    },
+    {
+      "title": {
+        "en": "Gate: flow check (flows:check)",
+        "it": "Controllo: flussi interattivi (flows:check)"
+      },
+      "body": {
+        "en": "It fails when an interactive flow such as this one is not valid JSON, lacks its English or Italian text, repeats a node id, or points an arrow or a step at a node that does not exist. It checks that the Italian text is there, not that it is up to date.",
+        "it": "Fallisce quando un flusso interattivo come questo non è JSON valido, è privo del testo inglese o italiano, ripete l'id di un nodo, oppure fa puntare una freccia o un passo a un nodo che non esiste. Verifica che il testo italiano ci sia, non che sia aggiornato."
+      },
+      "highlight": [
+        "flows-check"
+      ]
+    },
+    {
+      "title": {
+        "en": "Gate: site build for both locales (site:build)",
+        "it": "Controllo: build del sito per entrambe le lingue (site:build)"
+      },
+      "body": {
+        "en": "The site is built in English and in Italian. The build fails on a broken internal link and on a page that does not compile. A broken anchor only prints a warning. Whether the build checks links to other websites is not established, so treat them as unchecked.",
+        "it": "Il sito viene compilato in inglese e in italiano. La build fallisce se un link interno è rotto o se una pagina non compila. Un'ancora rotta produce solo un avviso. Non è accertato se la build controlli i link verso altri siti: vanno considerati non controllati."
+      },
+      "highlight": [
+        "site-build"
+      ]
+    },
+    {
+      "title": {
+        "en": "The static folder, to be published later",
+        "it": "La cartella statica, da pubblicare in seguito"
+      },
+      "body": {
+        "en": "The result is a folder of static files, website/build, with English at / and Italian at /it/. Publishing it on GitHub Pages is planned for the delivery phase. Today nothing publishes it, and the gates run only when someone runs task verify.",
+        "it": "Il risultato è una cartella di file statici, website/build, con l'inglese in / e l'italiano in /it/. La pubblicazione su GitHub Pages è prevista per la fase di delivery. Oggi nulla la pubblica, e i controlli girano solo quando qualcuno esegue task verify."
+      },
+      "highlight": [
+        "static",
+        "pages"
+      ]
+    }
+  ]
+}
