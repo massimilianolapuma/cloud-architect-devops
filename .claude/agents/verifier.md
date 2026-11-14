@@ -2,7 +2,7 @@
 name: verifier
 description: Runs this repository's verification gates (task verify, or the individual gate tasks until it exists) and returns PASS or FAIL with the raw gate output. Changes nothing. Used by the topic-build workflow after building and after translating.
 tools: Read, Bash, Glob, Grep
-model: inherit
+model: haiku
 ---
 
 # Verifier

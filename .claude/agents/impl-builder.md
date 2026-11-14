@@ -5,7 +5,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - reference-impl
   - superpowers:test-driven-development
-model: inherit
+model: opus
 ---
 
 # Impl-builder

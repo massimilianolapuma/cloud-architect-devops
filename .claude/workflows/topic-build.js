@@ -17,6 +17,9 @@ export const meta = {
 // + fix 1 (skipped when nothing to fix) + translate 1 + final verify 1 = at most 9.
 // Nothing is committed here: the controller reviews the returned files and commits them.
 
+// Models are set per call as well as in .claude/agents/<name>.md (keep the two equal): a run on
+// 2026-11-14 showed workflow agents on the session model after the agent files were changed mid-session.
+// architect-author and adversarial-reviewer set none, so they run on the session model.
 const TOPIC_RE = /^[a-z0-9-]+\/[a-z0-9-]+$/
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== ''
 const a = args || {}
@@ -194,7 +197,7 @@ phase('Plan')
 const plan = await agent(
   `Read ${designPath} and report from it, without changing anything and without running any command (use only Read, Glob and Grep). ` +
   `Also check that these exist and list in "missing" any that does not: ${designPath}, ${researchPaths.join(', ')}, and the ADR path design.md names.`,
-  { label: 'read design', phase: 'Plan', schema: PLAN_SCHEMA, effort: 'low' },
+  { label: 'read design', phase: 'Plan', schema: PLAN_SCHEMA, effort: 'low', model: 'sonnet' },
 )
 if (!plan) throw new Error('topic-build: could not read design.md; nothing built.')
 if (plan.missing.length) throw new Error(`topic-build: missing inputs, run topic-design first: ${plan.missing.join(', ')}`)
@@ -219,13 +222,13 @@ const builders = [
   ),
   () => agent(
     `topic: ${topic}\nchapter file: ${chapterPath}\n\n${NO_COMMIT}`,
-    { agentType: 'diagrammer', label: 'diagrams', phase: 'Build', schema: DIAGRAM_SCHEMA },
+    { agentType: 'diagrammer', model: 'opus', label: 'diagrams', phase: 'Build', schema: DIAGRAM_SCHEMA },
   ),
 ]
 if (runnable) {
   builders.push(() => agent(
     `topic: ${topic}\n\n${NO_COMMIT}`,
-    { agentType: 'impl-builder', label: 'runnable piece', phase: 'Build', schema: IMPL_SCHEMA },
+    { agentType: 'impl-builder', model: 'opus', label: 'runnable piece', phase: 'Build', schema: IMPL_SCHEMA },
   ))
 }
 const [chapter, diagrams, impl] = await parallel(builders)
@@ -250,7 +253,7 @@ phase('Verify')
 // Italian files do not exist yet, so i18n:check is excluded by design; the final verify runs it.
 const firstVerify = await agent(
   `Mode: pre-translation. Run every gate except task i18n:check.`,
-  { agentType: 'verifier', label: 'verify (pre-translation)', phase: 'Verify', schema: VERIFY_SCHEMA },
+  { agentType: 'verifier', model: 'haiku', label: 'verify (pre-translation)', phase: 'Verify', schema: VERIFY_SCHEMA },
 )
 const firstPassed = !!firstVerify && passed(firstVerify)
 if (!firstVerify) log('pre-translation verify did not complete; continuing to review')
@@ -322,7 +325,7 @@ for (const f of review.findings) {
 phase('Translate')
 const translation = await agent(
   `Translate these English files:\n${chapterPath}\n${adrPath}\n\n${NO_COMMIT}`,
-  { agentType: 'translator', label: 'translate', phase: 'Translate', schema: TRANSLATE_SCHEMA },
+  { agentType: 'translator', model: 'sonnet', label: 'translate', phase: 'Translate', schema: TRANSLATE_SCHEMA },
 )
 if (!translation) {
   return finish('fail', [...stepFailures, ...openFindings, 'translate: translator did not complete; final verify not run'])
@@ -334,7 +337,7 @@ translation.englishIssues.forEach((i) => log(`translator noted in English: ${i}`
 phase('Final verify')
 const finalVerify = await agent(
   'Run every gate. All steps, including the translation, have run.',
-  { agentType: 'verifier', label: 'final verify', phase: 'Final verify', schema: VERIFY_SCHEMA },
+  { agentType: 'verifier', model: 'haiku', label: 'final verify', phase: 'Final verify', schema: VERIFY_SCHEMA },
 )
 if (!finalVerify) {
   return finish('fail', [...stepFailures, ...openFindings, 'final verify: verifier did not complete'])

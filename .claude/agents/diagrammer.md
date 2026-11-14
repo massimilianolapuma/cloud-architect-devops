@@ -5,7 +5,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - drawio-diagram
   - interactive-diagram
-model: inherit
+model: opus
 ---
 
 # Diagrammer

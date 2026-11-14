@@ -4,7 +4,7 @@ description: Translates the English chapter and ADR of a guideline topic into It
 tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - bilingual-sync
-model: inherit
+model: sonnet
 ---
 
 # Translator
