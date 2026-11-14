@@ -1,7 +1,7 @@
 ---
 doc_type: adr
 title: Documentation as code with Docusaurus, English canonical and Italian translated
-status: proposed
+status: accepted
 date: 2026-11-14
 deciders: Massimiliano La Puma
 ---

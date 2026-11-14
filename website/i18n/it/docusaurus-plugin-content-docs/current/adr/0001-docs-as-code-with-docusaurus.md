@@ -1,10 +1,10 @@
 ---
 doc_type: adr
 title: Documentazione come codice con Docusaurus, inglese canonico e italiano tradotto
-status: proposed
+status: accepted
 date: 2026-11-14
 deciders: Massimiliano La Puma
-source_sha256: 9b5d52755cb0b40c28824b5adb3622b50ce2cff0a2e0b407842d86d63e7280d6
+source_sha256: 5e4dc81645c7b52b428a314ffb668a4f04f9a197adb5e9463c6b06ef4e7b52c6
 ---
 
 # ADR 0001: Documentazione come codice con Docusaurus, inglese canonico e italiano tradotto
