@@ -14,6 +14,9 @@ export const meta = {
 // questions to the user, and commits only after the user approves.
 
 // The researcher model is set per call as well as in .claude/agents/researcher.md (keep the two equal).
+// It is opus: on 2026-11-14 three sonnet researchers finished in under two minutes with 13 to 22 findings
+// each and left part of a lane unsearched. The prompt names the output file because all three wrote
+// under .work/<section>/<topic>/ instead of .work/<topic>/.
 // architect-author and adversarial-reviewer set none, so they run on the session model.
 const TOPIC_RE = /^[a-z0-9-]+\/[a-z0-9-]+$/
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== ''
@@ -97,8 +100,8 @@ const CHECK_SCHEMA = {
 phase('Research')
 const research = await parallel(LANES.map((lane) => () =>
   agent(
-    `topic: ${topic}\ntitle: ${a.title}\nlane: ${lane}\nbrief:\n${a.brief}`,
-    { agentType: 'researcher', model: 'sonnet', label: `research:${lane}`, phase: 'Research', schema: RESEARCH_SCHEMA },
+    `topic: ${topic}\ntitle: ${a.title}\nlane: ${lane}\noutput file: ${work}/research-${lane}.md\nbrief:\n${a.brief}`,
+    { agentType: 'researcher', model: 'opus', label: `research:${lane}`, phase: 'Research', schema: RESEARCH_SCHEMA },
   )))
 
 const failedLanes = []
