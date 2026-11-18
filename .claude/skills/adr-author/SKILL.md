@@ -14,7 +14,7 @@ An ADR records one decision in MADR form, starting from `templates/adr.en.md`. A
 1. New ADRs get `status: proposed`. Never change the `status` of an existing ADR. Before editing an existing ADR, read its `status`: if it is not `proposed`, do not edit the file; report the edit you would make instead. Never write `accepted` or `superseded`: only the user does.
 2. Never renumber or rename an existing ADR. Updating means editing that file.
 3. Every option, driver and consequence comes from `.work/<topic>/design.md` and the research files; unsupported technical claims are prefixed `UNVERIFIED:` or deleted.
-4. Link only to files that exist now. A file that does not exist yet (for example the chapter during `topic-design`) is named as a code span, e.g. `website/docs/00-foundations/docs-as-code.mdx`; a broken link fails `task site:build`.
+4. Link only to files that exist now. A file that does not exist yet (for example the chapter during `topic-design`) is named as a code span, e.g. `website/docs/00-foundations/docs-as-code.mdx`; a broken link fails `task site:build`. Link to another document under `website/docs/` from the content root, with a leading slash and the file extension, for example `[ADR 0001](/adr/0001-docs-as-code-with-docusaurus.md)` or `[the chapter](/00-foundations/docs-as-code.mdx)`; never with `./` or `../`. While a new English document has no Italian file, a relative link from it to a document that already has one fails the Italian build; a content-root link resolves in both languages.
 5. English only; do not create the Italian ADR (the translator does).
 
 ## Where and how it is named

@@ -49,7 +49,7 @@ _Guidance: the conditions under which another option is the better choice, state
 
 _Guidance: link the ADR that records this decision._
 
-See [ADR 0001](../adr/0001-kebab-title.md).
+See [ADR 0001](/adr/0001-kebab-title.md).
 
 ## Copy
 

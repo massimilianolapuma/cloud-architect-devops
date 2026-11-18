@@ -49,7 +49,7 @@ _Guidance: le condizioni, descritte in modo concreto, in cui un'altra opzione è
 
 _Guidance: collega l'ADR che registra questa decisione._
 
-Vedi [ADR 0001](../adr/0001-kebab-title.md).
+Vedi [ADR 0001](/adr/0001-kebab-title.md).
 
 ## Copiare
 
