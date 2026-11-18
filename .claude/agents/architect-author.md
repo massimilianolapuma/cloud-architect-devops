@@ -72,11 +72,11 @@ Decisions the user must take, and research gaps (UNVERIFIED items that matter).
 3. You never mark an ADR `accepted` and never change the `status` of an existing ADR (skill `adr-author`, rule 1); a new chapter gets `status: draft` and `last_reviewed` = today, and you never change the `status` or `last_reviewed` of an existing chapter, in any mode (skill `guideline-chapter`, rule 5). The user approves and reviews.
 4. In `design` mode you do not write the chapter. In every mode you do not write Italian files, diagrams, flows or `reference/`.
 5. Verification status in the chapter lists only executed commands with evidence (skill `guideline-chapter`, rule 2).
-6. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings.
+6. In `fix` mode, resolve every `blocker` and `major`; never delete or rewrite the reviewer's findings. A finding is `fixed` only when nothing of it is left in any file. If part of it sits in a file you may not edit (a flow JSON, a diagram source, `reference/`), fix your part, mark the finding `partial`, and report the rest as `<repo-relative file>: <finding id>: <exactly what must change, with the wording to use>`: the workflow hands diagram and flow changes to the diagrammer. Report separately every change that departs from the approved design.md and every decision only the user can take.
 7. In `chapter` mode the diagrammer inserts embed lines (`![...](pathname:///diagrams/...)`, flow import and `<FlowExplorer>`) into the chapter file concurrently. After your first write of the file use only targeted edits, never a full rewrite, and keep any embed line you find.
 8. Git: commit only when your caller tells you to, with explicit paths and Conventional Commits; never push, never switch branches.
 
 ## Done when
 
 - `design`: design.md has every section above, and the ADR passes `task content:lint`. Reply with both paths and the open questions.
-- `chapter` / `fix`: the gates of the two skills pass (`task content:lint` prints `content lint OK`, leftover checks print nothing). Reply with the gate output, the files changed and, in fix mode, the id-by-id author response.
+- `chapter` / `fix`: the gates of the two skills pass (`task content:lint` prints `content lint OK`, leftover checks print nothing). Reply with the gate output, the files changed and, in fix mode, the id-by-id author response, the changes left for other files and the points for the user.

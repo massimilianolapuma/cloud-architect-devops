@@ -7,14 +7,18 @@ export const meta = {
     { title: 'Build', detail: 'architect-author (chapter), diagrammer, impl-builder in parallel' },
     { title: 'Verify', detail: 'verifier, pre-translation: every gate except i18n:check' },
     { title: 'Review', detail: 'adversarial-reviewer, never sees design.md' },
-    { title: 'Fix', detail: 'architect-author resolves blocker and major findings, one round' },
+    { title: 'Fix', detail: 'architect-author resolves blocker and major findings, one round; diagrammer applies what they need in diagram and flow files' },
     { title: 'Translate', detail: 'translator writes the Italian chapter and ADR' },
     { title: 'Final verify', detail: 'verifier runs every gate' },
   ],
 }
 
 // Agents: plan 1 + build 3 (2 when the runnable piece is none) + verify 1 + review 1
-// + fix 1 (skipped when nothing to fix) + translate 1 + final verify 1 = at most 9.
+// + fix 1 (skipped when nothing to fix) + fix diagrams 1 (only when a finding needs a change in a
+// diagram or flow file) + translate 1 + final verify 1 = at most 10.
+// Result: { verify, openFindings, followUps, files }. followUps are not failures: they are what the
+// controller and the user still have to look at (departures from the approved design, changes nobody
+// in the chain could make, problems the translator saw in the English files).
 // Nothing is committed here: the controller reviews the returned files and commits them.
 
 // Models are set per call as well as in .claude/agents/<name>.md (keep the two equal): a run on
@@ -149,18 +153,27 @@ const FIX_SCHEMA = {
         type: 'object',
         properties: {
           id: { type: 'string' },
-          resolution: { type: 'string', enum: ['fixed', 'rejected'] },
-          note: { type: 'string', description: 'what changed, or the reason and evidence for rejecting' },
+          resolution: {
+            type: 'string',
+            enum: ['fixed', 'partial', 'rejected'],
+            description: 'fixed only if nothing of the finding is left in any file; partial if any part is left, including a part in a file you may not edit',
+          },
+          note: { type: 'string', description: 'what changed; for partial, what is left and where; for rejected, the reason and evidence' },
         },
         required: ['id', 'resolution', 'note'],
       },
-      description: 'one entry per blocker and major finding, as in your Author response',
+      description: 'one entry per blocker and major finding, and one per minor finding you chose to fix, as in your Author response',
     },
     gateFailuresNotFixed: { ...strings, description: 'failing gates from the verifier output you could not fix, with the reason' },
+    otherFiles: {
+      ...strings,
+      description: 'changes a finding still needs in files you may not edit (diagram sources, flow JSON, reference/). One entry per change, in this shape: "<repo-relative file path>: <finding id>: <exactly what must change, with the wording to use>"',
+    },
+    forUser: { ...strings, description: 'every change you made that departs from the approved design.md, and every decision only the user can take; empty if none' },
     files: { ...strings, description: 'every file you changed' },
     gateOutput: { type: 'string' },
   },
-  required: ['responses', 'gateFailuresNotFixed', 'files', 'gateOutput'],
+  required: ['responses', 'gateFailuresNotFixed', 'otherFiles', 'forUser', 'files', 'gateOutput'],
 }
 
 const TRANSLATE_SCHEMA = {
@@ -185,7 +198,8 @@ const addFiles = (step, list) => {
     else if (!f.startsWith('.work/')) files.add(f)
   }
 }
-const finish = (verify, openFindings) => ({ verify, openFindings, files: [...files].sort() })
+const followUps = []
+const finish = (verify, openFindings) => ({ verify, openFindings, followUps, files: [...files].sort() })
 
 // A verifier result counts as PASS only if it says PASS and every gate it ran exited 0.
 const failingGates = (v) => v.gates.filter((g) => g.exit !== 0)
@@ -276,6 +290,11 @@ log(`review: ${review.findings.length} findings, ${toFix.length} blocker/major`)
 
 // ---------------------------------------------------------------------------
 phase('Fix')
+// An otherFiles entry is "<path>: <finding id>: <change>". The path may come back absolute.
+const isDiagramChange = (c) => /^(diagrams|website\/src\/data\/flows|website\/static\/diagrams)\//.test(repoPath(c.split(':')[0].replace(/[`"']/g, '')) || '')
+const idsIn = (c) => c.match(/\bR\d+\b/g) || []
+const diagramFixedIds = new Set()
+const leftOpenIds = new Set()
 let fix = null
 const pendingEmbeds = diagrams ? diagrams.embedsNotInserted : []
 const needsFix = toFix.length > 0 || !firstPassed || pendingEmbeds.length > 0
@@ -301,24 +320,54 @@ if (needsFix) {
   }
   addFiles('fix: architect-author', fix.files)
   fix.gateFailuresNotFixed.forEach((g) => log(`fix: gate failure not fixed: ${g}`))
+  fix.forUser.forEach((u) => followUps.push(`for the user: ${u}`))
+
+  // The author may not edit diagram or flow files. What a finding needs there goes to the diagrammer;
+  // what it needs anywhere else (reference/, tools) stays open as a follow-up.
+  const forDiagrammer = fix.otherFiles.filter(isDiagramChange)
+  fix.otherFiles.filter((c) => !isDiagramChange(c)).forEach((c) => {
+    idsIn(c).forEach((id) => leftOpenIds.add(id))
+    followUps.push(`not applied, no agent in this workflow edits that file: ${c}`)
+  })
+  if (forDiagrammer.length) {
+    const diagramFix = await agent(
+      `mode: fix\ntopic: ${topic}\nchapter file: ${chapterPath}\n\n` +
+      `The review of the chapter needs these changes in diagram or flow files. Make exactly these changes and no other:\n` +
+      `${forDiagrammer.map((c) => `- ${c}`).join('\n')}\n\n${NO_COMMIT}`,
+      { agentType: 'diagrammer', model: 'opus', label: 'fix diagrams', phase: 'Fix', schema: DIAGRAM_SCHEMA },
+    )
+    if (diagramFix) {
+      addFiles('fix: diagrammer', diagramFix.files)
+      forDiagrammer.forEach((c) => idsIn(c).forEach((id) => diagramFixedIds.add(id)))
+      log(`fix: diagrammer applied ${forDiagrammer.length} change(s) in diagram or flow files`)
+    } else {
+      stepFailures.push('fix: diagrammer did not complete; changes in diagram or flow files not applied')
+      forDiagrammer.forEach((c) => {
+        idsIn(c).forEach((id) => leftOpenIds.add(id))
+        followUps.push(`not applied, diagrammer did not complete: ${c}`)
+      })
+    }
+  }
 } else {
   log('fix skipped: no blocker or major finding, no pending diagram embed, and the pre-translation verify passed')
 }
 
-// Findings that stay open after the single fix round. A finding counts as resolved only
-// if the author's response marks it fixed; the reasons are in review.md "Author response".
+// Findings that stay open after the single fix round. A finding counts as resolved if the author's
+// response marks it fixed, or marks it partial and the diagrammer applied everything that was left.
+// A minor finding with no response was outside the fix round. The reasons are in review.md "Author response".
 const responseById = new Map(((fix && fix.responses) || []).map((r) => [r.id, r]))
 const openFindings = []
 let openBlockers = 0
 for (const f of review.findings) {
-  if (f.severity === 'minor') {
+  const r = responseById.get(f.id)
+  if (r && r.resolution === 'fixed') continue
+  if (r && r.resolution === 'partial' && diagramFixedIds.has(f.id) && !leftOpenIds.has(f.id)) continue
+  if (!r && f.severity === 'minor') {
     openFindings.push(`${f.id} (minor): ${f.summary} — not in fix scope`)
     continue
   }
-  const r = responseById.get(f.id)
-  if (r && r.resolution === 'fixed') continue
   if (f.severity === 'blocker') openBlockers++
-  openFindings.push(`${f.id} (${f.severity}): ${f.summary} — ${r ? `rejected: ${r.note}` : 'not addressed'}`)
+  openFindings.push(`${f.id} (${f.severity}): ${f.summary} — ${r ? `${r.resolution}: ${r.note}` : 'not addressed'}`)
 }
 
 // ---------------------------------------------------------------------------
@@ -331,7 +380,7 @@ if (!translation) {
   return finish('fail', [...stepFailures, ...openFindings, 'translate: translator did not complete; final verify not run'])
 }
 addFiles('translate: translator', translation.files)
-translation.englishIssues.forEach((i) => log(`translator noted in English: ${i}`))
+translation.englishIssues.forEach((i) => followUps.push(`translator noted in the English files: ${i}`))
 
 // ---------------------------------------------------------------------------
 phase('Final verify')

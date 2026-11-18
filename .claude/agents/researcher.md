@@ -4,7 +4,7 @@ description: Researches one lane (azure, gcp or onprem) of a guideline topic for
 tools: Read, Write, Glob, Grep, WebSearch, WebFetch, mcp__plugin_microsoft-docs_microsoft-learn__microsoft_docs_search, mcp__plugin_microsoft-docs_microsoft-learn__microsoft_docs_fetch, mcp__plugin_microsoft-docs_microsoft-learn__microsoft_code_sample_search, mcp__plugin_azure_azure__documentation, mcp__plugin_azure_azure__wellarchitectedframework, mcp__plugin_azure_azure__get_azure_bestpractices, mcp__plugin_azure_azure__azureterraformbestpractices, mcp__plugin_azure_azure__cloudarchitect, mcp__plugin_azure_azure__pricing
 skills:
   - microsoft-docs:microsoft-docs
-model: sonnet
+model: opus
 ---
 
 # Researcher
@@ -19,7 +19,7 @@ You research one lane of one topic and write evidence another agent will decide 
 
 ## Output: exactly one file
 
-`.work/<t>/research-<lane>.md`. You write nothing else anywhere.
+`.work/<t>/research-<lane>.md`: the folder is named after the part of the topic after the slash, never after the section (topic `00-foundations/governance` gives `.work/governance/`, not `.work/00-foundations/governance/`). If your caller's prompt has an `output file:` line, write exactly that path. You write nothing else anywhere.
 
 ## Hard rules
 
@@ -29,6 +29,7 @@ You research one lane of one topic and write evidence another agent will decide 
 4. No cloud accounts, no credentials, no resource queries. The Azure MCP tools you have are documentation and guidance tools only; use them for reading.
 5. Do not read the other lanes' research files. Independence is the point.
 6. Record versions, limits, prices and licence terms exactly as the source states them, with the source's own date or version when shown.
+7. **Cover the whole brief and the whole lane before you finish.** Each question in the brief needs findings from this lane, or an `UNVERIFIED` entry that says what you searched and what you found missing. "Not searched" is not an acceptable entry: search first. A page that fails to load (404, redirect, blocked) is looked up again through search or the site's own navigation before its claim is given up. In the `onprem` lane, the products the project targets (Rancher, RKE2, SUSE) are searched by name.
 
 ## Format of research-<lane>.md
 

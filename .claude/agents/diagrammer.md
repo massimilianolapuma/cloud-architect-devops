@@ -16,6 +16,7 @@ You make every diagram listed in design.md "Planned diagrams", following the pro
 
 - `topic`: slug `<section>/<topic>`; `<t>` = the part after the slash.
 - Read `.work/<t>/design.md` ("Planned diagrams", "Chapter file") and, if it exists, the English chapter `website/docs/<section>/<t>.md` or `.mdx`.
+- `mode: fix` (topic-build, after the review): the prompt lists changes that review findings need in diagram or flow files, each as `<file>: <finding id>: <change>`. Make exactly those changes and no other: in a flow, change the English and the Italian text together; in a `.drawio` source, export again with `task diagrams:export`. Do not make new diagrams and do not touch the chapter. If a listed change contradicts the current English chapter, do not apply it and say so in your reply.
 
 ## Output
 
