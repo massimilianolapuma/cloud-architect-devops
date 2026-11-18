@@ -10,13 +10,14 @@ Enterprise architecture guidelines (multi-tenant, cloud-agnostic across Azure, G
 
 | Path | Holds |
 |---|---|
-| `website/docs/` | All guideline content (English, canonical): chapters, ADRs under `adr/`, `intro.mdx`, `compliance/` |
+| `website/docs/` | All guideline content (English, canonical): chapters, ADRs under `adr/`, exception records under `exceptions/`, `intro.mdx`, `compliance/` |
 | `website/i18n/it/` | Italian mirror of `website/docs/` (translated and stamped) |
 | `website/src/`, `website/static/diagrams/` | Site code, interactive flows (`src/data/flows/*.json`), exported SVGs |
 | `diagrams/` | draw.io sources (`<section>/<name>.drawio`), exported to SVG |
 | `reference/` | Runnable pieces (manifests, charts, modules, migrations, scripts); `reference/testbed/` is the local test bed |
-| `templates/` | `chapter.{en,it}.md`, `adr.{en,it}.md`: the document contract |
+| `templates/` | `chapter.{en,it}.md`, `adr.{en,it}.md`, `exception.{en,it}.md`: the document contract |
 | `tools/` | ESM `.mjs` gate scripts with `node --test` tests |
+| `.github/` | The CI workflow that runs the gates (`workflows/verify.yml`) and `CODEOWNERS` |
 | `.claude/` | `skills/`, `agents/`, `workflows/` of the agentic chain |
 | `docs/superpowers/` | Approved design spec (`specs/`) and plans (`plans/`). The root `docs/` holds nothing else |
 | `.work/<topic>/` | Git-ignored working files of a topic: research, `design.md`, `review.md` |
@@ -41,7 +42,7 @@ Guideline content lives in `website/docs/`, never in the root `docs/`.
 
 ## Document contract
 
-Chapters and ADRs start from `templates/` (`chapter.en.md`, `adr.en.md`, and the `.it.md` counterparts). A chapter has frontmatter (`doc_type`, `title`, `owner`, `status`, `last_reviewed`) and the H2 sections `Understand`, `Decide`, `Copy`, `Verification status`. An ADR is a MADR file under `website/docs/adr/`. `task content:lint` enforces this; the templates are the reference. A doc that embeds a flow must be `.mdx` in both languages.
+Chapters and ADRs start from `templates/` (`chapter.en.md`, `adr.en.md`, and the `.it.md` counterparts). A chapter has frontmatter (`doc_type`, `title`, `owner`, `owner_handle`, `status`, `last_reviewed`; `owner_handle` is the owner's GitHub handle, quoted: `'@user'` or `'@org/team'`) and the H2 sections `Understand`, `Decide`, `Copy`, `Verification status`. An ADR is a MADR file under `website/docs/adr/`. An exception record (`doc_type: exception`, template `templates/exception.en.md` and `.it.md`) lives only at `website/docs/exceptions/<section>/<chapter>/<id>.md`, where `<section>/<chapter>` is an existing chapter, with every field of the template present (`id` as `exc-NNNN`, `title`, `guideline`, `scope`, `category`, `status`, `requested_by`, `requested_on`, `approved_by`, `approved_on`, `expires` at most 6 months after `approved_on`, `replaces`, `restricted_ref`) and the H2 sections `Reason`, `Risk`, `Compensating control`, `Plan to comply`, `Platform objects`. `task content:lint` enforces this; the templates are the reference. A doc that embeds a flow must be `.mdx` in both languages.
 
 ## How a topic is made
 
@@ -53,7 +54,7 @@ Agents and skills for each step are in `.claude/agents/` and `.claude/skills/`; 
 
 ## Verification
 
-- `task verify` runs, in order and stopping at the first failure: `doctor`, `test:tools`, `content:lint`, `i18n:check`, `diagrams:check`, `flows:check`, `agentic:lint`, `site:build`.
+- `task verify` runs, in order and stopping at the first failure: `doctor`, `test:tools`, `content:lint`, `codeowners:check`, `i18n:check`, `diagrams:check`, `flows:check`, `agentic:lint`, `site:build`.
 - `task verify` must exit 0 before you declare anything finished. Report its real output; never claim a pass you did not see.
 - `task site:dev` starts the dev server. `task diagrams:export` regenerates SVGs from `diagrams/*.drawio`.
 
