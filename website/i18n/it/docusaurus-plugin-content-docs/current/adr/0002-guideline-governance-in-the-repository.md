@@ -4,7 +4,7 @@ title: Governance delle linee guida nel repository, con responsabili, record di 
 status: proposed
 date: 2026-11-18
 deciders: Massimiliano La Puma
-source_sha256: ba5562e86f401c86b7bd9904cbfb58d2195b34303094abac7addc4ea3cf38705
+source_sha256: cf99d7da76adc6fe2626a67cd7ce53a98f8d01e38eb040dcc9681ef6d09ec86e
 ---
 
 # ADR 0002: Governance delle linee guida nel repository, con responsabili, record di eccezione con scadenza e un ciclo di revisione
@@ -92,7 +92,7 @@ Non in atto al 2026-11-18: nessun controllo legge una data di scadenza né confr
 - Negativo, perché finché il sostituto non è nominato le eccezioni del responsabile stesso non hanno un'approvazione indipendente, e dopo il bypass del responsabile per le modifiche ai suoi capitoli gli permette anche di saltare il sostituto dove il piano non ha la regola di revisore basata sul percorso; un tale merge è una traccia, non un'approvazione.
 - Negativo, perché parte dell'assetto e le tracce più lunghe dipendono da ciò che l'organizzazione ha, che non è stato osservato: le opzioni di ruleset sopra sono documentate solo per GitHub Enterprise Cloud, la dashboard dei rule insights richiede GitHub Team o Enterprise Cloud, e l'[audit log dell'enterprise](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/about-the-audit-log-for-your-enterprise), che conserva gli eventi per 180 giorni a meno che siano trasmessi in streaming, esiste solo per un'enterprise.
 - Negativo, perché un richiedente ha bisogno di git e di una pull request; il [capitolo docs-as-code](/00-foundations/docs-as-code.mdx) elenca lo stesso limite per i contributori.
-- Negativo, perché ogni record pubblicato sotto `website/docs/` richiede una traduzione italiana per superare `task i18n:check`, e finché il lint dei contenuti non conosce un tipo di documento eccezione nessun tale record può essere aggiunto senza farlo fallire.
+- Negativo, perché ogni record pubblicato sotto `website/docs/` richiede una traduzione italiana per superare `task i18n:check`.
 
 ### Conferma
 
@@ -111,7 +111,7 @@ Un'eccezione è un file con campi fissi in una cartella del capitolo che allenta
 - Positivo, perché una data obbligatoria in un file può essere letta da un controllo offline scritto con gli strumenti del repository, e quel controllo può essere reso un [required status check](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
 - Positivo, perché il code owner del capitolo è interpellato automaticamente per la revisione e deve approvare, e il richiedente non può approvare la propria pull request.
 - Positivo, perché i record escono come file semplici con la loro cronologia, e le eccezioni restano fuori dal log delle decisioni.
-- Negativo, perché la regola di lint, il report, il file `CODEOWNERS` e le regole del forge non esistono ancora.
+- Negativo, perché le regole del forge e il workflow pianificato del report non esistono ancora; la regola di lint, il report e il file `CODEOWNERS` sono stati aggiunti il 2026-11-18.
 - Negativo, perché amministratori e bypass actor possono fare merge senza l'approvazione del responsabile, uno stato con lo stesso nome può soddisfare il controllo richiesto finché la sua fonte non è fissata, e il report pianificato può essere ritardato, scartato o disattivato dopo 60 giorni di quiete.
 - Negativo, perché il repository è pubblico, quindi i dettagli che non possono essere pubblici vivono altrove e un record ammesso rivela comunque quale regola è derogata.
 - Negativo, perché l'oggetto di piattaforma va tenuto allineato al record a mano dove la piattaforma non documenta alcuna scadenza.

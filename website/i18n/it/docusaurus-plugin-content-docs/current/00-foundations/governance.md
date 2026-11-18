@@ -2,9 +2,10 @@
 doc_type: chapter
 title: Governare le linee guida
 owner: Massimiliano La Puma
+owner_handle: '@massilp'
 status: draft
 last_reviewed: 2026-11-18
-source_sha256: e18e4f258cfa425869ca27ac7bee8e98f1ea597bbe659aa976b7b4956c1e5d0b
+source_sha256: e15d2bc60bbc8d5b967ca8a5eb4bd3c8b60c19c0a70b6e3048b4ce1800fe05a6
 ---
 
 # Governare le linee guida
@@ -295,7 +296,7 @@ Proposte con il disegno e approvate con esso il 2026-11-18:
 
 ## Copiare
 
-Per questo argomento non c'è alcun pezzo eseguibile sotto `reference/`. Nulla qui gira su un cluster o un database: sono ruoli, record e date. Il lavoro di follow-up cambia `tools/`, `templates/`, `CLAUDE.md`, `.github/` e le impostazioni sul forge, ed è elencato nella [Checklist di adozione](#checklist-di-adozione) con la sua tempistica. Al 2026-11-18 un team può usare il formato del record, per preparare una richiesta, e un responsabile può usare la checklist di revisione. I passi della richiesta non si possono ancora eseguire: il loro primo artefatto, il file del record, fallisce `task content:lint` finché il tipo di documento `exception` non esiste (vedi [Modello del record di eccezione](#modello-del-record-di-eccezione)).
+Per questo argomento non c'è alcun pezzo eseguibile sotto `reference/`. Nulla qui gira su un cluster o un database: sono ruoli, record e date. Il lavoro di follow-up cambia `tools/`, `templates/`, `CLAUDE.md`, `.github/` e le impostazioni sul forge, ed è elencato nella [Checklist di adozione](#checklist-di-adozione) con la sua tempistica. Dal 2026-11-18 un team può registrare un record e seguire i passi della richiesta, e un responsabile può usare la checklist di revisione; ciò che li impone sul forge deve ancora arrivare (vedi [Checklist di adozione](#checklist-di-adozione)).
 
 ### Contenuto ammesso in un record
 
@@ -321,7 +322,7 @@ Cosa rivela comunque un record ammesso: che una regola nominata è derogata o mi
 
 ### Modello del record di eccezione
 
-Il percorso è `website/docs/exceptions/SECTION/CHAPTER/ID.md`, dove `SECTION/CHAPTER` è il percorso del capitolo la cui regola è allentata, per esempio `website/docs/exceptions/00-foundations/docs-as-code/`. Al 2026-11-18 un tale file non si può ancora aggiungere: `task content:lint` rifiuta un documento il cui tipo non conosce, con `unknown doc_type "exception" (allowed: chapter, adr, page)`. Il tipo di documento, la sua regola di lint e i suoi template sono lavoro di follow-up della fase 0.
+Il percorso è `website/docs/exceptions/SECTION/CHAPTER/ID.md`, dove `SECTION/CHAPTER` è il percorso del capitolo la cui regola è allentata, per esempio `website/docs/exceptions/00-foundations/docs-as-code/`. Si parte da `templates/exception.en.md` e `templates/exception.it.md`. L'identificatore è `exc-` seguito da quattro cifre, unico fra tutti i record, e il file prende il suo nome. `task content:lint` controlla il record senza leggere la data di oggi: ogni campo presente, date reali, `expires` non oltre 6 mesi dopo `approved_on`, la cartella coerente con `guideline` e con un capitolo esistente, `replaces` che nomina un record esistente, `restricted_ref` che non è un URL.
 
 ```markdown
 ---
@@ -375,7 +376,7 @@ Da dove vengono i campi: la categoria e il richiedente, l'approvatore e la data 
 7. Dopo un'approvazione, il team di piattaforma crea l'oggetto di piattaforma con l'identificatore del record e, dove la piattaforma ne ha una, la stessa data di scadenza.
 8. Prima della data: adeguarsi e impostare `status: closed`, dopo di che il team di piattaforma rimuove l'oggetto di piattaforma; oppure richiedere un rinnovo con un nuovo record il cui `replaces` nomina questo; il merge del rinnovo imposta questo record a `replaced`.
 
-**Non utilizzabile al 2026-11-18.** Finché il lavoro di follow-up della fase 0 non aggiunge il tipo di documento `exception`, la sua regola di lint, i suoi template e il template italiano (vedi [Checklist di adozione](#checklist-di-adozione)), non aprire la pull request del passo 3: il record fallisce `task content:lint` con `unknown doc_type "exception"`, e `task i18n:check` per l'assenza del file italiano. Poiché il forge non richiede i gate, una tale pull request potrebbe comunque essere integrata e lasciare `main` in errore. Come un team registri un'eccezione di cui ha bisogno prima di allora non è stato deciso al 2026-11-18.
+**Utilizzabile dal 2026-11-18, senza imposizione sul forge.** Il record è controllato da `task content:lint` e richiede il suo file italiano per superare `task i18n:check`. Poiché il forge non richiede ancora i gate, una pull request che li fallisce potrebbe comunque essere integrata e lasciare `main` in errore: esegui `task verify` prima dell'integrazione.
 
 Finché le regole del forge della fase di delivery non sono collegate, nulla sul forge richiede il passo 4 o 5: poggiano sul revisore. Finché il sostituto non è nominato, un'eccezione che il responsabile richiede per un proprio capitolo viene integrata da lui, con il suo nome come richiedente e approvatore (vedi [Chi possiede cosa](#chi-possiede-cosa)).
 
@@ -398,15 +399,15 @@ A ogni revisione programmata o guidata da eventi di un capitolo:
 
 ### Checklist di adozione
 
-Lavoro di follow-up e relativa tempistica, deciso il 2026-11-18. Nulla di tutto ciò esiste a quella data.
+Lavoro di follow-up e relativa tempistica, deciso il 2026-11-18. Le voci della fase 0 sono state aggiunte lo stesso giorno, dopo la prima stesura di questo capitolo: `task content:lint` (record di eccezione, `owner_handle`), `task codeowners:check` (un gate di `task verify` e del workflow delle pull request), `task governance:report` (mai un gate) e `.github/CODEOWNERS`. Le voci della fase di delivery non esistono ancora.
 
 Fase 0, ora:
 
-- [ ] Aggiungere il tipo di documento `exception` a `tools/content-lint.mjs`, con test e template in inglese e in italiano in `templates/`, e la riga corrispondente in `CLAUDE.md`.
-- [ ] Aggiungere una regola di lint per i record di eccezione che non dipenda dal giorno in cui gira: ogni campo presente, date reali, `expires` non oltre 6 mesi dopo `approved_on`, la cartella del record che corrisponde al suo `guideline`, `restricted_ref` un identificatore e non un URL.
-- [ ] Aggiungere il report datato come task, con test `node --test`: eccezioni scadute o in scadenza entro 30 giorni, record scaduti o chiusi che nominano oggetti di piattaforma, record attivi il cui approvatore è il loro richiedente, e capitoli oltre il loro intervallo di revisione. Non deve mai far fallire un merge, perché un controllo che dipende dalla data di oggi rende rosso oggi un commit che ieri passava, senza alcuna modifica.
-- [ ] Aggiungere `.github/CODEOWNERS` con un responsabile per il file stesso, una riga per `.github/workflows/` così che una modifica al workflow dei gate richieda la revisione del responsabile, una riga per cartella di sezione, e una riga per file di capitolo e per cartella di record del capitolo.
-- [ ] Aggiungere un campo `owner_handle` al template del capitolo (lo username GitHub del responsabile o il team dell'organizzazione), richiesto dal lint, e un controllo che corrisponda alla riga `CODEOWNERS` del capitolo. Il campo `owner` contiene il nome di una persona, che `CODEOWNERS` non può usare.
+- [x] Aggiungere il tipo di documento `exception` a `tools/content-lint.mjs`, con test e template in inglese e in italiano in `templates/`, e la riga corrispondente in `CLAUDE.md`.
+- [x] Aggiungere una regola di lint per i record di eccezione che non dipenda dal giorno in cui gira: ogni campo presente, date reali, `expires` non oltre 6 mesi dopo `approved_on`, la cartella del record che corrisponde al suo `guideline`, `restricted_ref` un identificatore e non un URL.
+- [x] Aggiungere il report datato come task, con test `node --test`: eccezioni scadute o in scadenza entro 30 giorni, record scaduti o chiusi che nominano oggetti di piattaforma, record attivi il cui approvatore è il loro richiedente, e capitoli oltre il loro intervallo di revisione. Non deve mai far fallire un merge, perché un controllo che dipende dalla data di oggi rende rosso oggi un commit che ieri passava, senza alcuna modifica.
+- [x] Aggiungere `.github/CODEOWNERS` con un responsabile per il file stesso, una riga per `.github/workflows/` così che una modifica al workflow dei gate richieda la revisione del responsabile, una riga per cartella di sezione, e una riga per file di capitolo e per cartella di record del capitolo.
+- [x] Aggiungere un campo `owner_handle` al template del capitolo (lo username GitHub del responsabile o il team dell'organizzazione), richiesto dal lint, e un controllo che corrisponda alla riga `CODEOWNERS` del capitolo. Il campo `owner` contiene il nome di una persona, che `CODEOWNERS` non può usare.
 
 Fase di delivery, con l'altra applicazione sul forge:
 
@@ -469,7 +470,7 @@ I bypass actor dei ruleset sono [ruoli, team e app](https://docs.github.com/en/e
 - **Il record non controlla la piattaforma.** Un'eccezione ha effetto su una piattaforma quando il suo oggetto viene creato, qualunque cosa dica il record, e un record può scadere mentre il suo oggetto resta in vigore dove la piattaforma non documenta alcuna scadenza.
 - **L'applicazione sul forge è specifica di GitHub**, in parte dipende dal piano dell'organizzazione, che non è stato osservato, e le approvazioni restano sul forge, da leggere tramite la sua API prima di andarsene.
 - **I richiedenti hanno bisogno di git e di una pull request**, lo stesso limite che il [capitolo docs-as-code](/00-foundations/docs-as-code.mdx) elenca per i contributori.
-- **Ogni record pubblicato richiede una traduzione italiana** per superare il gate di parità delle traduzioni, e finché il lint dei contenuti non conosce il tipo di documento `exception`, nessun record può essere aggiunto sotto `website/docs/` senza farlo fallire.
+- **Ogni record pubblicato richiede una traduzione italiana** per superare il gate di parità delle traduzioni.
 - **Come si marca un capitolo come obsoleto non è progettato**, e le regole non hanno ancora identificatori stabili; entrambi si decidono nella fase 1.
 - **Il capitolo docs-as-code approvato e l'ADR 0001 accettato dicono** che se una revisione di pull request possa essere resa obbligatoria non è stato ricercato. La ricerca per questo capitolo mostra che si può, con una regola di branch protection o un [ruleset](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). Quei documenti non sono modificati qui.
 
@@ -482,10 +483,11 @@ Questo argomento non ha un pezzo eseguibile, quindi nulla al suo interno può es
   - `task site:build`: ha stampato `[SUCCESS] Generated static files in "build".` e `[SUCCESS] Generated static files in "build/it".`; exit 0, senza alcun warning di Docusaurus (il suo unico warning è un `ExperimentalWarning` di Node.js su `localStorage`). Mostra che la pagina, il suo diagramma Mermaid e i suoi link tra documenti si compilano nel sito inglese, e nel sito italiano come pagina di ripiego in inglese, poiché al 2026-11-18, quando è stato eseguito, questo capitolo non aveva ancora un file italiano; non dice nulla su una pagina italiana.
   - Il verificatore pre-traduzione della build di questo argomento, il 2026-11-18, ha superato ogni gate che ha eseguito (output del verificatore consegnato all'autore).
   - `task verify`, eseguito il 2026-11-18 dopo che questo capitolo e l'ADR 0002 hanno avuto i loro file italiani: exit 0. I suoi otto passi sono stati eseguiti in ordine: `doctor`; `test:tools` con 59 test passati e 0 falliti; poi `content lint OK`, `i18n parity OK`, `diagrams OK`, `flows OK (2)`, `agentic lint OK`, e la build del sito ha stampato `[SUCCESS] Generated static files in "build".` e `[SUCCESS] Generated static files in "build/it".`. È l'unica esecuzione di questo elenco fatta con i file italiani al loro posto.
+  - Strumenti della fase 0, eseguiti il 2026-11-18 dopo l'aggiunta del lavoro di follow-up: `task codeowners:check` ha stampato `codeowners OK`; un record di prova creato da `templates/exception.en.md` e `templates/exception.it.md` sotto `exceptions/00-foundations/docs-as-code/` è stato compilato in entrambe le lingue con `task site:build`, è stato elencato come `lapsed` da `node tools/governance-report.mjs --today 2026-11-18`, ed è stato cancellato. I test unitari della regola di lint, del report e del controllo dei responsabili girano in `task test:tools`.
 - **Non provato:**
   - Le impostazioni del forge non sono state lette. L'unica osservazione del forge è la `gh api repos/massimilianolapuma/cloud-architect-devops` di sola lettura del 2026-11-18, eseguita durante la progettazione di questo argomento dal suo chiamante, non dall'autore, il cui output (visibilità pubblica, tipo di proprietario `Organization`) è stato consegnato all'autore; è un'osservazione, non una prova di qualcosa in questo capitolo.
   - Ogni meccanismo sul forge: l'instradamento di `CODEOWNERS` e i suoi modi di fallire, ruleset e branch protection, la revisione richiesta e il required status check, il pinning della fonte di un controllo, il respingimento delle approvazioni obsolete, i bypass actor e la modalità di bypass "For pull requests only", la regola di revisore basata sul percorso, la modalità Evaluate, i rule insights, i workflow pianificati e la regola dei 60 giorni, e l'audit log dell'enterprise. Nessuno è configurato al 2026-11-18, e il comportamento di una revisione richiesta quando l'autore è l'unico code owner richiede un secondo account con accesso in scrittura per essere osservato.
-  - Il tipo di documento eccezione, la sua regola di lint, il report datato e il controllo `owner_handle`: non esistono al 2026-11-18 (lavoro di follow-up della fase 0).
+  - Il report datato e il controllo dei responsabili su record di eccezione reali: non esiste ancora alcun record.
   - Ogni meccanismo di piattaforma in [Eccezioni che una piattaforma applica](#eccezioni-che-una-piattaforma-applica): esenzioni e attestazioni di Azure Policy, esenzioni di Defender for Cloud, Organization Policy di Google Cloud, tag, Policy Analyzer, IAM Conditions, Privileged Access Manager e mute rule richiedono un vero tenant o organizzazione; Kyverno, Gatekeeper, Kubewarden e Pod Security Admission richiedono un cluster. Tutto ciò che si dice su di essi è letto dalla documentazione.
   - I tracker (GitHub Issues e Projects, Azure Boards, Jira Cloud, Jira Service Management): letti solo dalla documentazione.
   - I passi della richiesta e la checklist di revisione in [Copiare](#copiare): non ancora seguiti per una vera eccezione o una vera revisione.

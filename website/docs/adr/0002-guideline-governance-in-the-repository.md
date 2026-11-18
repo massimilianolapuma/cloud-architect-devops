@@ -91,7 +91,7 @@ Not in place on 2026-11-18: no check reads an expiry date or compares a review d
 - Bad, because until the deputy is named the owner's own exceptions have no independent approval, and afterwards the owner's bypass for his chapter edits also lets him skip the deputy wherever the plan lacks the path-based reviewer rule; such a merge is a trail, not an approval.
 - Bad, because part of the arrangement and the longer trails depend on what the organisation has, which was not observed: the ruleset options above are documented only for GitHub Enterprise Cloud, the rule insights dashboard needs GitHub Team or Enterprise Cloud, and the [enterprise audit log](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/about-the-audit-log-for-your-enterprise), which keeps events for 180 days unless they are streamed, exists only for an enterprise.
 - Bad, because a requester needs git and a pull request; the [docs-as-code chapter](/00-foundations/docs-as-code.mdx) lists the same limit for contributors.
-- Bad, because every record published under `website/docs/` needs an Italian translation to pass `task i18n:check`, and until the content lint knows an exception document type no such record can be added without failing it.
+- Bad, because every record published under `website/docs/` needs an Italian translation to pass `task i18n:check`.
 
 ### Confirmation
 
@@ -110,7 +110,7 @@ An exception is a file with fixed fields in a folder of the chapter it relaxes, 
 - Good, because a mandatory date in a file can be read by an offline check written with the repository's tools, and that check can be made a [required status check](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
 - Good, because the code owner of the chapter is asked for review automatically and must approve, and the requester cannot approve his own pull request.
 - Good, because the records leave as plain files with their history, and exceptions stay out of the decision log.
-- Bad, because the lint rule, the report, the `CODEOWNERS` file and the forge rules do not exist yet.
+- Bad, because the forge rules and the scheduled workflow of the report do not exist yet; the lint rule, the report and the `CODEOWNERS` file were added on 2026-11-18.
 - Bad, because administrators and bypass actors can merge without the owner's approval, a status of the same name can satisfy the required check until its source is pinned, and the scheduled report can be delayed, dropped or switched off after 60 quiet days.
 - Bad, because the repository is public, so detail that may not be public lives elsewhere and a permitted record still discloses which rule is waived.
 - Bad, because the platform object must be kept in step with the record by hand where the platform documents no expiry.
