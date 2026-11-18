@@ -2,6 +2,7 @@
 doc_type: chapter
 title: Governing the guidelines
 owner: Massimiliano La Puma
+owner_handle: '@massilp'
 status: draft
 last_reviewed: 2026-11-18
 ---
@@ -294,7 +295,7 @@ Proposed with the design and approved with it on 2026-11-18:
 
 ## Copy
 
-There is no runnable piece under `reference/` for this topic. Nothing here runs on a cluster or a database: it is roles, records and dates. The follow-up work changes `tools/`, `templates/`, `CLAUDE.md`, `.github/` and settings on the forge, and it is listed under [Adoption checklist](#adoption-checklist) with its timing. On 2026-11-18 a team can use the record format, to prepare a request, and an owner can use the review checklist. The request steps cannot be carried out yet: their first artefact, the record file, fails `task content:lint` until the `exception` document type exists (see [Exception record template](#exception-record-template)).
+There is no runnable piece under `reference/` for this topic. Nothing here runs on a cluster or a database: it is roles, records and dates. The follow-up work changes `tools/`, `templates/`, `CLAUDE.md`, `.github/` and settings on the forge, and it is listed under [Adoption checklist](#adoption-checklist) with its timing. Since 2026-11-18 a team can file a record and follow the request steps, and an owner can use the review checklist; what enforces them on the forge is still to come (see [Adoption checklist](#adoption-checklist)).
 
 ### What a record may contain
 
@@ -320,7 +321,7 @@ What a permitted record still discloses: that a named rule is waived or mitigate
 
 ### Exception record template
 
-The path is `website/docs/exceptions/SECTION/CHAPTER/ID.md`, where `SECTION/CHAPTER` is the path of the chapter whose rule is relaxed, for example `website/docs/exceptions/00-foundations/docs-as-code/`. On 2026-11-18 such a file cannot be added yet: `task content:lint` rejects a document whose type it does not know, with `unknown doc_type "exception" (allowed: chapter, adr, page)`. The document type, its lint rule and its templates are follow-up work of phase 0.
+The path is `website/docs/exceptions/SECTION/CHAPTER/ID.md`, where `SECTION/CHAPTER` is the path of the chapter whose rule is relaxed, for example `website/docs/exceptions/00-foundations/docs-as-code/`. Start from `templates/exception.en.md` and `templates/exception.it.md`. The identifier is `exc-` and four digits, unique across all records, and the file is named after it. `task content:lint` checks the record without reading today's date: every field present, real dates, `expires` no later than 6 months after `approved_on`, the folder matching `guideline` and an existing chapter, `replaces` naming an existing record, `restricted_ref` not a URL.
 
 ```markdown
 ---
@@ -374,7 +375,7 @@ Where the fields come from: the category and the requester, approver and approva
 7. After an approval, the platform team creates the platform object with the record's identifier and, where the platform has one, the same expiry date.
 8. Before the date: comply and set `status: closed`, after which the platform team removes the platform object; or request a renewal with a new record whose `replaces` names this one; the merge of the renewal sets this record to `replaced`.
 
-**Not usable on 2026-11-18.** Until the phase-0 follow-up work adds the `exception` document type, its lint rule, its templates and the Italian template (see [Adoption checklist](#adoption-checklist)), do not open the pull request of step 3: the record fails `task content:lint` with `unknown doc_type "exception"`, and `task i18n:check` with no Italian file. Because the forge does not require the gates, such a pull request could still be merged and leave `main` failing. How a team records an exception it needs before then has not been decided on 2026-11-18.
+**Usable since 2026-11-18, without enforcement on the forge.** The record is checked by `task content:lint` and needs its Italian file to pass `task i18n:check`. Because the forge does not require the gates yet, a pull request that fails them could still be merged and leave `main` failing: run `task verify` before merging.
 
 Until the forge rules of the delivery phase are wired, nothing on the forge requires step 4 or 5: they rest on the reviewer. Until the deputy is named, an exception the owner requests for his own chapter is merged by him, with his name as requester and approver (see [Who owns what](#who-owns-what)).
 
@@ -397,15 +398,15 @@ At each scheduled or event-driven review of a chapter:
 
 ### Adoption checklist
 
-Follow-up work and its timing, decided on 2026-11-18. None of it exists on that date.
+Follow-up work and its timing, decided on 2026-11-18. The phase-0 items were added on the same day, after this chapter was first written: `task content:lint` (exception records, `owner_handle`), `task codeowners:check` (a gate of `task verify` and of the pull-request workflow), `task governance:report` (never a gate) and `.github/CODEOWNERS`. The delivery-phase items do not exist yet.
 
 Phase 0, now:
 
-- [ ] Add the `exception` document type to `tools/content-lint.mjs`, with tests and English and Italian templates in `templates/`, and the line about it in `CLAUDE.md`.
-- [ ] Add a lint rule for exception records that does not depend on the day it runs: every field present, real dates, `expires` no later than 6 months after `approved_on`, the record's folder matching its `guideline`, `restricted_ref` an identifier and not a URL.
-- [ ] Add the dated report as a task, with `node --test` tests: exceptions lapsed or lapsing within 30 days, lapsed or closed records that name platform objects, active records whose approver is their requester, and chapters past their review interval. It must never fail a merge, because a check that depends on today's date turns a commit that passed yesterday red today with no change.
-- [ ] Add `.github/CODEOWNERS` with an owner for the file itself, a line for `.github/workflows/` so that a change to the workflow of the gates needs the owner's review, a line per section folder, and a line per chapter file and per chapter folder of records.
-- [ ] Add an `owner_handle` field to the chapter template (the owner's GitHub username or organisation team), required by the lint, and a check that it matches the chapter's `CODEOWNERS` line. The `owner` field holds a person's name, which `CODEOWNERS` cannot use.
+- [x] Add the `exception` document type to `tools/content-lint.mjs`, with tests and English and Italian templates in `templates/`, and the line about it in `CLAUDE.md`.
+- [x] Add a lint rule for exception records that does not depend on the day it runs: every field present, real dates, `expires` no later than 6 months after `approved_on`, the record's folder matching its `guideline`, `restricted_ref` an identifier and not a URL.
+- [x] Add the dated report as a task, with `node --test` tests: exceptions lapsed or lapsing within 30 days, lapsed or closed records that name platform objects, active records whose approver is their requester, and chapters past their review interval. It must never fail a merge, because a check that depends on today's date turns a commit that passed yesterday red today with no change.
+- [x] Add `.github/CODEOWNERS` with an owner for the file itself, a line for `.github/workflows/` so that a change to the workflow of the gates needs the owner's review, a line per section folder, and a line per chapter file and per chapter folder of records.
+- [x] Add an `owner_handle` field to the chapter template (the owner's GitHub username or organisation team), required by the lint, and a check that it matches the chapter's `CODEOWNERS` line. The `owner` field holds a person's name, which `CODEOWNERS` cannot use.
 
 Delivery phase, with the other forge enforcement:
 
@@ -468,7 +469,7 @@ Ruleset bypass actors are [roles, teams and apps](https://docs.github.com/en/ent
 - **The record does not control the platform.** An exception takes effect on a platform when its object is created, whatever the record says, and a record can lapse while its object stays in force where the platform documents no expiry.
 - **The forge enforcement is GitHub-specific**, part of it depends on the organisation's plan, which was not observed, and the approvals stay on the forge, to be read out through its API before leaving.
 - **Requesters need git and a pull request**, the same limit the [docs-as-code chapter](/00-foundations/docs-as-code.mdx) lists for contributors.
-- **Each published record needs an Italian translation** to pass the translation parity gate, and until the content lint knows the `exception` document type, no record can be added under `website/docs/` without failing it.
+- **Each published record needs an Italian translation** to pass the translation parity gate.
 - **How a chapter is marked obsolete is not designed**, and rules have no stable identifiers yet; both are decided in phase 1.
 - **The approved docs-as-code chapter and the accepted ADR 0001 say** that whether a pull-request review can be made required was not researched. The research for this chapter shows that it can, by a branch protection rule or a [ruleset](https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets). Those documents are not changed here.
 
@@ -481,10 +482,11 @@ This topic has no runnable piece, so nothing in it can be exercised on a worksta
   - `task site:build`: printed `[SUCCESS] Generated static files in "build".` and `[SUCCESS] Generated static files in "build/it".`; exit 0, with no Docusaurus warning (its only warning is a Node.js `ExperimentalWarning` about `localStorage`). It shows that the page, its Mermaid diagram and its links between documents build in the English site, and in the Italian site as the English fallback page, since on 2026-11-18, when it ran, this chapter had no Italian file yet; it says nothing about an Italian page.
   - The pre-translation verifier of this topic's build, on 2026-11-18, passed every gate it ran (verifier output handed to the author).
   - `task verify`, run on 2026-11-18 after this chapter and ADR 0002 had their Italian files: exit 0. Its eight steps ran in order: `doctor`; `test:tools` with 59 tests passed and 0 failed; then `content lint OK`, `i18n parity OK`, `diagrams OK`, `flows OK (2)`, `agentic lint OK`, and the site build printed `[SUCCESS] Generated static files in "build".` and `[SUCCESS] Generated static files in "build/it".`. This is the only run in this list made with the Italian files in place.
+  - Tooling of phase 0, run on 2026-11-18 after the follow-up work was added: `task codeowners:check` printed `codeowners OK`; a scratch record made from `templates/exception.en.md` and `templates/exception.it.md` under `exceptions/00-foundations/docs-as-code/` built in both languages with `task site:build`, was listed as `lapsed` by `node tools/governance-report.mjs --today 2026-11-18`, and was deleted. The unit tests of the lint rule, the report and the owners check run in `task test:tools`.
 - **Not exercised:**
   - The forge's settings were not read. The only observation of the forge is the read-only `gh api repos/massimilianolapuma/cloud-architect-devops` of 2026-11-18, run during the design of this topic by its caller, not by the author, whose output (visibility public, owner type `Organization`) was handed to the author; it is an observation, not a test of anything in this chapter.
   - Every mechanism on the forge: `CODEOWNERS` routing and its failure modes, rulesets and branch protection, the required review and the required status check, pinning the source of a check, stale-approval dismissal, bypass actors and the bypass mode "For pull requests only", the path-based reviewer rule, Evaluate mode, rule insights, scheduled workflows and the 60-day rule, and the enterprise audit log. None of them is configured on 2026-11-18, and the behaviour of a required review when the author is the only code owner needs a second account with write access to observe.
-  - The exception document type, its lint rule, the dated report and the `owner_handle` check: they do not exist on 2026-11-18 (follow-up work of phase 0).
+  - The dated report and the owners check on real exception records: no record exists yet.
   - Every platform mechanism under [Exceptions that a platform enforces](#exceptions-that-a-platform-enforces): Azure Policy exemptions and attestations, Defender for Cloud exemptions, Google Cloud Organization Policy, tags, Policy Analyzer, IAM Conditions, Privileged Access Manager and mute rules need a real tenant or organisation; Kyverno, Gatekeeper, Kubewarden and Pod Security Admission need a cluster. Everything said about them is read from documentation.
   - The trackers (GitHub Issues and Projects, Azure Boards, Jira Cloud, Jira Service Management): read from documentation only.
   - The request steps and the review checklist under [Copy](#copy): not yet followed for a real exception or a real review.

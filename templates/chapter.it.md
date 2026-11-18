@@ -2,13 +2,14 @@
 doc_type: chapter
 title: Titolo del capitolo
 owner: team-o-persona
+owner_handle: '@utente-github'
 status: draft
 last_reviewed: 2026-01-01
 ---
 
 # Titolo del capitolo
 
-_Guidance: elimina ogni riga che inizia con "_Guidance:" prima di pubblicare. Mantieni identici i quattro titoli H2 qui sotto; puoi aggiungere altre sezioni se servono._
+_Guidance: `owner_handle` è lo username GitHub o il team dell'organizzazione del responsabile, tra apici, con la `@` iniziale: `'@user'` o `'@org/team'`. Elimina ogni riga che inizia con "_Guidance:" prima di pubblicare. Mantieni identici i quattro titoli H2 qui sotto; puoi aggiungere altre sezioni se servono._
 
 ## Capire
 

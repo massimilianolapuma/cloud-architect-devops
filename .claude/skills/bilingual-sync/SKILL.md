@@ -30,7 +30,7 @@ Stamp: `node tools/i18n-parity.mjs stamp <rel>` (`<rel>` relative to `website/do
 | Translate | Keep exactly |
 |---|---|
 | prose, headings, table text, list items, link text, image alt text | fenced code blocks, inline code, commands, paths, URLs, link and image targets |
-| frontmatter `title` | every other frontmatter key and value (`doc_type`, `status`, `owner`, `last_reviewed`, `date`, `deciders`, `slug`, ...) |
+| frontmatter `title` | every other frontmatter key and value (`doc_type`, `status`, `owner`, `owner_handle`, `last_reviewed`, `date`, `deciders`, `slug`, ...) |
 | Mermaid node labels | Mermaid node ids and keywords |
 | | `import` lines and JSX such as `<FlowExplorer flow={x} />` |
 

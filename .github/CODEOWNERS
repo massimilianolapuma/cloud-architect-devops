@@ -1,0 +1,35 @@
+# Code owners of this repository. GitHub asks the owners of every path a pull request
+# changes for a review (see website/docs/00-foundations/governance.md).
+#
+# The last matching pattern wins, so the lines go from general to specific.
+# `tools/codeowners.mjs` (task codeowners:check, part of task verify) checks this file:
+# the owner of each chapter, the line for each chapter's folder of exception records,
+# the owners of this file and of .github/workflows/, and malformed lines.
+# Use only the pattern forms it implements: *, /path/to/file and /path/to/folder/.
+
+# Default owner of everything.
+* @massilp
+
+# This file, and the workflow that runs the gates.
+/.github/CODEOWNERS @massilp
+/.github/workflows/ @massilp
+
+# Section folders, English and Italian.
+/website/docs/00-foundations/ @massilp
+/website/docs/adr/ @massilp
+/website/docs/compliance/ @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/00-foundations/ @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/adr/ @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/compliance/ @massilp
+
+# Chapter 00-foundations/docs-as-code: the chapter and its folder of exception records.
+/website/docs/00-foundations/docs-as-code.mdx @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/00-foundations/docs-as-code.mdx @massilp
+/website/docs/exceptions/00-foundations/docs-as-code/ @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/exceptions/00-foundations/docs-as-code/ @massilp
+
+# Chapter 00-foundations/governance: the chapter and its folder of exception records.
+/website/docs/00-foundations/governance.md @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/00-foundations/governance.md @massilp
+/website/docs/exceptions/00-foundations/governance/ @massilp
+/website/i18n/it/docusaurus-plugin-content-docs/current/exceptions/00-foundations/governance/ @massilp

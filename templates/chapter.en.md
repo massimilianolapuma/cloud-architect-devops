@@ -2,13 +2,14 @@
 doc_type: chapter
 title: Chapter title
 owner: team-or-person
+owner_handle: '@github-user'
 status: draft
 last_reviewed: 2026-01-01
 ---
 
 # Chapter title
 
-_Guidance: delete every line starting with "_Guidance:" before publishing. Keep the four H2 headings below verbatim; add further sections where useful._
+_Guidance: `owner_handle` is the owner's GitHub username or organisation team, quoted, with a leading `@`: `'@user'` or `'@org/team'`. Delete every line starting with "_Guidance:" before publishing. Keep the four H2 headings below verbatim; add further sections where useful._
 
 ## Understand
 

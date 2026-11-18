@@ -30,7 +30,7 @@ A chapter gives three audiences what they need: **Understand** (stakeholders), *
 ## Steps
 
 1. Read design.md, the three research files and `templates/chapter.en.md`.
-2. If the output file already exists, edit it in place and keep its `status` and `last_reviewed` (rule 5). Otherwise copy the template to the output path. Frontmatter of a new chapter: `doc_type: chapter`, real `title`, `owner` as named in design.md (if none: `unassigned`, and say so in your report), `status: draft`, `last_reviewed` = today (`date +%F`).
+2. If the output file already exists, edit it in place and keep its `status` and `last_reviewed` (rule 5). Otherwise copy the template to the output path. Frontmatter of a new chapter: `doc_type: chapter`, real `title`, `owner` as named in design.md (if none: `unassigned`, and say so in your report), `owner_handle` = the owner's GitHub username or organisation team, quoted with a leading `@` (`'@user'` or `'@org/team'`; if design.md names none, the owner of the section folder's line in `.github/CODEOWNERS`, and say so in your report), `status: draft`, `last_reviewed` = today (`date +%F`).
 3. Keep the four H2 headings verbatim: `Understand`, `Decide`, `Copy`, `Verification status`. Add further sections only where useful.
 4. **Understand**: problem, why it matters, outcome, in plain language; explain every term a non-engineer would not know. Embed each diagram design.md plans for this view, at its exact path: `![<what the diagram shows>](pathname:///diagrams/<section>/<name>.svg)`. The `pathname://` prefix is mandatory. If design.md plans a flow, add after the frontmatter and before the H1:
    ```mdx
