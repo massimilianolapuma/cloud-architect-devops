@@ -17,6 +17,7 @@ tasks:
       - task: doctor
       - task: test:tools
       - task: content:lint
+      - task: codeowners:check
       - task: i18n:check
       - task: diagrams:check
       - task: flows:check
@@ -32,6 +33,16 @@ tasks:
     desc: Fail if a chapter or ADR lacks its required frontmatter or sections
     cmds:
       - node tools/content-lint.mjs
+
+  codeowners:check:
+    desc: Fail if .github/CODEOWNERS is malformed or does not match each chapter's owner_handle
+    cmds:
+      - node tools/codeowners.mjs
+
+  governance:report:
+    desc: "Dated report of lapsing exceptions and overdue reviews; always exits 0 (pass -- --today YYYY-MM-DD)"
+    cmds:
+      - node tools/governance-report.mjs {{.CLI_ARGS}}
 
   flows:check:
     desc: Fail if an interactive flow in website/src/data/flows is malformed

@@ -56,6 +56,9 @@ jobs:
       - name: 'Gate: content lint'
         run: task content:lint
 
+      - name: 'Gate: code owners'
+        run: task codeowners:check
+
       - name: 'Gate: EN/IT parity'
         run: task i18n:check
 
